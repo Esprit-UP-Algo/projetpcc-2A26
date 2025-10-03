@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>client-removebg-preview.png</file>
+        <file>fournisseurs-removebg-preview.png</file>
+        <file>locaux-removebg-preview.png</file>
+        <file>personal-removebg-preview.png</file>
+        <file>produit-removebg-preview.png</file>
+        <file>tt.png</file>
+    </qresource>
+</RCC>
