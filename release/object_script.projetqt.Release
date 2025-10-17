@@ -1,0 +1,10 @@
+release/main.o
+release/mainwindow.o
+release/qrc_M.o
+release/qrc_Mpower.o
+release/qrc_amg.o
+release/qrc_img.o
+release/qrc_img2.o
+release/qrc_mm.o
+release/qrc_resources.o
+release/moc_mainwindow.o

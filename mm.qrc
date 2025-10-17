@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>uplode-removebg-preview.png</file>
+        <file>456.png</file>
+        <file>123.png</file>
+    </qresource>
+</RCC>
