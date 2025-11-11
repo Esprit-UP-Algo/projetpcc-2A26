@@ -202,7 +202,7 @@ font-size: 20px;
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../../../integration/integration/adem/img.qrc">:/new/prefix1/tt.png</pixmap>
+      <pixmap resource="img.qrc">:/new/prefix1/tt.png</pixmap>
      </property>
     </widget>
     <widget class="QLabel" name="label_11">
@@ -221,7 +221,7 @@ font-size: 20px;
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../../../integration/integration/adem/img.qrc">:/new/prefix1/client-removebg-preview.png</pixmap>
+      <pixmap resource="img.qrc">:/new/prefix1/client-removebg-preview.png</pixmap>
      </property>
     </widget>
     <widget class="QLabel" name="label_12">
@@ -240,7 +240,7 @@ font-size: 20px;
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../../../integration/integration/adem/img.qrc">:/new/prefix1/fournisseurs-removebg-preview.png</pixmap>
+      <pixmap resource="img.qrc">:/new/prefix1/fournisseurs-removebg-preview.png</pixmap>
      </property>
     </widget>
     <widget class="QLabel" name="label_13">
@@ -259,7 +259,7 @@ font-size: 20px;
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../../../integration/integration/adem/img.qrc">:/new/prefix1/produit-removebg-preview.png</pixmap>
+      <pixmap resource="img.qrc">:/new/prefix1/produit-removebg-preview.png</pixmap>
      </property>
     </widget>
     <widget class="QLabel" name="label_14">
@@ -278,7 +278,7 @@ font-size: 20px;
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../../../integration/integration/adem/img.qrc">:/new/prefix1/personal-removebg-preview.png</pixmap>
+      <pixmap resource="img.qrc">:/new/prefix1/personal-removebg-preview.png</pixmap>
      </property>
     </widget>
     <widget class="QLabel" name="label_15">
@@ -297,7 +297,7 @@ font-size: 20px;
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../../../integration/integration/adem/img.qrc">:/new/prefix1/locaux-removebg-preview.png</pixmap>
+      <pixmap resource="img.qrc">:/new/prefix1/locaux-removebg-preview.png</pixmap>
      </property>
     </widget>
    </widget>
@@ -311,7 +311,7 @@ font-size: 20px;
      </rect>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="personnel">
      <widget class="QStackedWidget" name="stackedWidget_3">
@@ -1754,7 +1754,7 @@ QPushButton:hover {
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>:/new/prefix1/maps.jpg</pixmap>
+          <pixmap resource="Mpower.qrc">:/new/prefix1/maps.jpg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -2176,7 +2176,7 @@ border-color: rgb(0, 0, 127);</string>
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>:/new/prefix1/qq.jpg</pixmap>
+          <pixmap resource="Mpower.qrc">:/new/prefix1/qq.jpg</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -2256,7 +2256,7 @@ QPushButton:hover {
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_7">
        <widget class="QFrame" name="frame_5">
@@ -2774,7 +2774,7 @@ QPushButton:hover {
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>:/new/prefix1/123.png</pixmap>
+         <pixmap resource="mm.qrc">:/new/prefix1/123.png</pixmap>
         </property>
        </widget>
        <widget class="QLabel" name="label_3">
@@ -2790,7 +2790,7 @@ QPushButton:hover {
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>:/new/prefix1/456.png</pixmap>
+         <pixmap resource="mm.qrc">:/new/prefix1/456.png</pixmap>
         </property>
        </widget>
       </widget>
@@ -3035,25 +3035,6 @@ border-color: rgb(0, 0, 127);</string>
           <string>New</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEditDateNaissance_4">
-         <property name="geometry">
-          <rect>
-           <x>230</x>
-           <y>360</y>
-           <width>251</width>
-           <height>26</height>
-          </rect>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">color: rgb(0, 0, 0);</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="placeholderText">
-          <string>Date de naissance</string>
-         </property>
-        </widget>
         <widget class="QLineEdit" name="lineEditID_3">
          <property name="geometry">
           <rect>
@@ -3175,7 +3156,7 @@ QLabel#photoClient:hover {
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>:/new/prefix1/uplode-removebg-preview.png</pixmap>
+          <pixmap resource="mm.qrc">:/new/prefix1/uplode-removebg-preview.png</pixmap>
          </property>
         </widget>
         <widget class="QTextEdit" name="textEdit">
@@ -3280,6 +3261,51 @@ QListWidget::item:selected {
     background-color: #a29bfe;
     color: white;
 }</string>
+         </property>
+        </widget>
+        <widget class="QDateEdit" name="lineEditDateNaissance_4">
+         <property name="geometry">
+          <rect>
+           <x>230</x>
+           <y>360</y>
+           <width>251</width>
+           <height>29</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(0, 0, 0);</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditPhoto">
+         <property name="geometry">
+          <rect>
+           <x>600</x>
+           <y>200</y>
+           <width>113</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(0, 0, 0);</string>
+         </property>
+         <property name="placeholderText">
+          <string>Chemin de la photo</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditOrdonnance">
+         <property name="geometry">
+          <rect>
+           <x>800</x>
+           <y>340</y>
+           <width>113</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(0, 0, 0);</string>
+         </property>
+         <property name="placeholderText">
+          <string>Chemin de l'ordonnance</string>
          </property>
         </widget>
        </widget>
@@ -4233,7 +4259,7 @@ QPushButton:hover {
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_10">
        <widget class="QFrame" name="frame_12">
@@ -4737,7 +4763,7 @@ border-color: rgb(0, 0, 255);</string>
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>:/new/prefix1/784a706a-f6af-4062-9180-299d6847a0c1.png</pixmap>
+          <pixmap resource="M.qrc">:/new/prefix1/784a706a-f6af-4062-9180-299d6847a0c1.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -4762,7 +4788,7 @@ border-color: rgb(0, 0, 255);</string>
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>:/new/prefix1/456.png</pixmap>
+          <pixmap resource="mm.qrc">:/new/prefix1/456.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -4903,7 +4929,7 @@ border-bottom-left-radius: 25px;</string>
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap>:/new/prefix1/fd6699_5ad46a373a2e4385bddfb0c531358041~mv2.png</pixmap>
+           <pixmap resource="amg.qrc">:/new/prefix1/fd6699_5ad46a373a2e4385bddfb0c531358041~mv2.png</pixmap>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -5557,12 +5583,18 @@ font-size: 20px;
      <x>0</x>
      <y>0</y>
      <width>1499</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="mm.qrc"/>
+  <include location="img.qrc"/>
+  <include location="Mpower.qrc"/>
+  <include location="amg.qrc"/>
+  <include location="M.qrc"/>
+ </resources>
  <connections/>
 </ui>

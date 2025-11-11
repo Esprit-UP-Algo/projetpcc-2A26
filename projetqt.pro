@@ -1,5 +1,7 @@
-QT       += core gui
-
+QT       += core gui \
+    quick
+QT += sql
+QT += core gui widgets printsupport
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
@@ -11,13 +13,22 @@ CONFIG += console
 
 SOURCES += \
     connection.cpp \
+    gestion_client.cpp \
+    gestion_fournisseur.cpp \
+    gestion_personnel.cpp \
+    gestion_locaux.cpp \
+    gestion_produit.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     connection.h \
+    gestion_client.h \
+    gestion_personnel.h \
+    gestion_locaux.h \
+    gestion_fournisseur.h \
+    gestion_produit.h \
     mainwindow.h
-
 FORMS += \
     mainwindow.ui
 
