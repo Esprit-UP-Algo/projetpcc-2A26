@@ -1,498 +1,427 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QTableWidgetItem>
+#include "connection.h"
+#include "gestion_client.h"
+#include "gestion_fournisseur.h"
+#include "gestion_locaux.h"
+#include "gestion_produit.h"
+
 #include <QMessageBox>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QFileDialog>
+#include <QPrinter>
+#include <QTextDocument>
+#include <QTextTable>
+#include <QTextCursor>
+#include <QTextTableFormat>
+#include <QDate>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+}
 
-    // CONNEXIONS DE LA BARRE LATÉRALE
-    connect(ui->toolButton_client1, &QToolButton::clicked, this, &MainWindow::showClientInterface);
-    connect(ui->toolButton_person1, &QToolButton::clicked, this, &MainWindow::showPersonnelInterface);
-    connect(ui->toolButton_loc1, &QToolButton::clicked, this, &MainWindow::showLocauxInterface);
+//===================== TABLE LOCAUX ITEM CHANGED =====================
+void MainWindow::onTableLocauxItemChanged(QTableWidgetItem *item)
+{
+    if (!item || item->column() == 0 || item->column() == 7) return;
 
-    // NOUVELLES CONNEXIONS - Fournisseurs et Produits
-    connect(ui->toolButton_fourn1, &QToolButton::clicked, this, &MainWindow::showFournisseurInterface);
-    connect(ui->toolButton_prod1, &QToolButton::clicked, this, &MainWindow::showProduitsInterface);
+    int row = item->row();
+    int col = item->column();
+    int id = ui->locaux->item(row, 0)->text().toInt();
+    QString value = item->text().trimmed();
 
-    // Interface par défaut - Clients
-    showClientInterface();
+    QString champ;
+    QVariant sqlValue;
 
-    // Navigation pour Clients
-    connect(ui->btnAjouterClient_4, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_4->setCurrentIndex(2);
-    });
-
-    connect(ui->btnListeClients_4, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_4->setCurrentIndex(0);
-    });
-
-    connect(ui->btnAjouterClient_5, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_4->setCurrentIndex(2);
-    });
-
-    connect(ui->btnListeClients_5, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_4->setCurrentIndex(0);
-    });
-
-    // Navigation pour Personnel
-    connect(ui->btnAjouterPersonnel_3, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(2);
-    });
-
-    connect(ui->btnListePersonnel_3, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(0);
-    });
-
-    connect(ui->btnAjouterClient_2, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(2);
-    });
-
-    connect(ui->btnListeClients_2, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(0);
-    });
-
-    // Navigation pour Locaux
-    connect(ui->btnAjouterPersonnel_4, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_2->setCurrentIndex(2);
-    });
-
-    connect(ui->btnListePersonnel_4, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_2->setCurrentIndex(0);
-    });
-
-    connect(ui->btnAjouterClient_3, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_2->setCurrentIndex(2);
-    });
-
-    connect(ui->btnListeClients_3, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_2->setCurrentIndex(0);
-    });
-
-    // NOUVELLES CONNEXIONS - Navigation pour Fournisseurs
-    connect(ui->btnAjouterClient_6, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_5->setCurrentIndex(2);
-    });
-
-    connect(ui->btnListeClients_6, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_5->setCurrentIndex(0);
-    });
-
-    connect(ui->btnAjouterClient_7, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_5->setCurrentIndex(2);
-    });
-
-    connect(ui->btnListeClients_7, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_5->setCurrentIndex(0);
-    });
-
-    // NOUVELLES CONNEXIONS - Navigation pour Produits
-    connect(ui->btnAjouterPersonnel_5, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_6->setCurrentIndex(2);
-    });
-
-    connect(ui->btnListePersonnel_5, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_6->setCurrentIndex(0);
-    });
-
-    connect(ui->btnAjouterClient_8, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_6->setCurrentIndex(2);
-    });
-
-    connect(ui->btnListeClients_8, &QPushButton::clicked, [=]() {
-        ui->stackedWidget_6->setCurrentIndex(0);
-    });
-
-    // ========== CONFIGURATION DE LA TABLE CLIENTS ==========
-    ui->tableClients->setRowCount(8);
-    QStringList prenoms = {"Sophie", "Pierre", "Marie", "Jean", "Laura", "Thomas", "Emma", "Nicolas"};
-    QStringList noms = {"Martin", "Dubois", "Bernard", "Moreau", "Petit", "Leroy", "Roux", "Garcia"};
-
-    for (int row = 0; row < 8; ++row) {
-        ui->tableClients->setItem(row, 0, new QTableWidgetItem(QString::number(100 + row)));
-        ui->tableClients->setItem(row, 1, new QTableWidgetItem(noms[row]));
-        ui->tableClients->setItem(row, 2, new QTableWidgetItem(prenoms[row]));
-        ui->tableClients->setItem(row, 3, new QTableWidgetItem(QString::number(25 + row)));
-        ui->tableClients->setItem(row, 4, new QTableWidgetItem(row % 3 == 0 ? "VIP" : (row % 3 == 1 ? "Fidèle" : "Nouveau")));
-        ui->tableClients->setItem(row, 5, new QTableWidgetItem(QString("01234567%1").arg(row)));
-        ui->tableClients->setItem(row, 6, new QTableWidgetItem(row % 2 == 0 ? "Homme" : "Femme"));
+    switch (col) {
+    case 1:
+        if (!Gestion_Locaux::isValidNom(value)) {
+            QMessageBox::warning(this, "Erreur", "Nom invalide !");
+            rafraichirTableauLocaux();
+            return;
+        }
+        champ = "NOM"; sqlValue = value;
+        break;
+    case 2:
+        if (!value.toInt() || !Gestion_Locaux::isValidTelephone(value.toInt())) {
+            QMessageBox::warning(this, "Erreur", "Téléphone invalide !");
+            rafraichirTableauLocaux();
+            return;
+        }
+        champ = "TELEPHONE"; sqlValue = value.toInt();
+        break;
+    case 3:
+        champ = "ADRESSE"; sqlValue = value.left(20);
+        break;
+    case 4:
+        champ = "SUPERFICIE"; sqlValue = value.left(20);
+        break;
+    case 5:
+        champ = "CHIFFRE_DAFFAIRE"; sqlValue = value.left(20);
+        break;
+    case 6:
+        if (!Gestion_Locaux::isValidEtat(value)) {
+            QMessageBox::warning(this, "Erreur", "État invalide !");
+            rafraichirTableauLocaux();
+            return;
+        }
+        champ = "ETAT_DE_LOCAL"; sqlValue = value;
+        break;
+    default: return;
     }
 
-    ui->tableClients->setColumnWidth(7, 180);
-    ui->tableClients->setColumnWidth(8, 100);
-
-    for (int row = 0; row < ui->tableClients->rowCount(); ++row) {
-        QWidget *widget = new QWidget();
-        QHBoxLayout *layout = new QHBoxLayout(widget);
-
-        QPushButton *btnModif = new QPushButton("MOD️");
-        QPushButton *btnSupp = new QPushButton("SUP️");
-        QPushButton *btnSMS = new QPushButton("📱 SMS");
-
-        btnModif->setStyleSheet(
-            "QPushButton {"
-            "    background-color: rgb(0, 0, 124);"
-            "    color: white;"
-            "    border-radius: 8px;"
-            "    padding: 8px 12px;"
-            "    border: none;"
-            "    font-weight: bold;"
-            "    font-size: 8px;"
-            "    min-width: 80px;"
-            "}"
-            "QPushButton:hover {"
-            "    background-color: #2980b9;"
-            "}"
-            );
-
-        btnSupp->setStyleSheet(
-            "QPushButton {"
-            "    background-color: #cd6155;"
-            "    color: white;"
-            "    border-radius: 8px;"
-            "    padding: 8px 12px;"
-            "    border: none;"
-            "    font-weight:bold;"
-            "    font-size: 8px;"
-            "    min-width: 80px;"
-            "}"
-            "QPushButton:hover {"
-            "    background-color: #c0392b;"
-            "}"
-            );
-        btnSMS->setStyleSheet(
-            "QPushButton {"
-            "    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #6c5ce7, stop:1 #a29bfe);"
-            "    color: white;"
-            "    border-radius: 8px;"
-            "    padding: 8px 12px;"
-            "    border: none;"
-            "    font-weight: bold;"
-            "    font-size: 8px;"
-            "    min-width: 80px;"
-            "}"
-            "QPushButton:hover {"
-            "    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #5a4a82, stop:1 #41375f);"
-            "}"
-            );
-
-        // Connecter les boutons à des actions
-        connect(btnModif, &QPushButton::clicked, [=]() {
-            QMessageBox::information(this, "Modification", "Modifier le client: " + noms[row] + " " + prenoms[row]);
-        });
-
-        connect(btnSupp, &QPushButton::clicked, [=]() {
-            QMessageBox::warning(this, "Suppression", "Supprimer le client: " + noms[row] + " " + prenoms[row]);
-        });
-
-        connect(btnSMS, &QPushButton::clicked, [=]() {
-            QMessageBox::information(this, "SMS", "Envoyer SMS à: " + noms[row] + " " + prenoms[row]);
-        });
-
-        layout->addWidget(btnModif);
-        layout->addWidget(btnSupp);
-        layout->setContentsMargins(5, 2, 5, 2);
-        layout->setSpacing(8);
-
-        ui->tableClients->setCellWidget(row, 7, widget);
-        ui->tableClients->setCellWidget(row, 8, btnSMS);
+    Connection c;
+    if (!c.createconnect()) {
+        QMessageBox::critical(this, "Erreur", "Connexion échouée !");
+        return;
     }
 
-    // ========== CONFIGURATION DE LA TABLE PERSONNEL ==========
-    QTableWidget* tablePersonnel = ui->tablePersonnel;
+    QSqlQuery q;
+    q.prepare(QString("UPDATE LOCAUX SET %1 = :val WHERE ID_LOCAL = :id").arg(champ));
+    q.bindValue(":val", sqlValue);
+    q.bindValue(":id", id);
 
-    // Configuration du tableau
-    tablePersonnel->setRowCount(8);
+    if (!q.exec()) {
+        QMessageBox::critical(this, "Erreur", "Échec : " + q.lastError().text());
+        rafraichirTableauLocaux();
+    }
+}
 
-    // Ajuster la largeur des colonnes
-    tablePersonnel->verticalHeader()->setDefaultSectionSize(45);
-    tablePersonnel->setColumnWidth(7, 60);  // Colonne "Documents"
-    tablePersonnel->setColumnWidth(8, 60);  // Colonne "Permissions"
-    tablePersonnel->setColumnWidth(9, 90);  // Colonne "Actions"
+//===================== TABLE FOURNISSEUR ITEM CHANGED =====================
+void MainWindow::onTableFournisseurItemChanged(QTableWidgetItem *item)
+{
+    if (!item || item->column() == 0 || item->column() == 8) return;
 
-    // Ajouter des données d'exemple au tableau personnel
-    QStringList nomsPersonnel = {"Dupont", "Martin", "Bernard", "Dubois", "Thomas", "Robert", "Richard", "Petit"};
-    QStringList prenomsPersonnel = {"Jean", "Marie", "Pierre", "Sophie", "Luc", "Anne", "Paul", "Claire"};
-    QStringList roles = {"Responsable", "Vendeur", "Manager", "Opticien", "Vendeur", "Manager", "Opticien", "Responsable"};
+    int row = item->row();
+    int col = item->column();
+    int id = ui->fournisseur->item(row, 0)->text().toInt();
+    QString value = item->text().trimmed();
 
-    for (int row = 0; row < tablePersonnel->rowCount(); ++row) {
-        // Remplir les données du personnel
-        tablePersonnel->setItem(row, 0, new QTableWidgetItem(QString::number(row + 1001)));
-        tablePersonnel->setItem(row, 1, new QTableWidgetItem(nomsPersonnel[row]));
-        tablePersonnel->setItem(row, 2, new QTableWidgetItem(prenomsPersonnel[row]));
-        tablePersonnel->setItem(row, 3, new QTableWidgetItem("0123456789"));
-        tablePersonnel->setItem(row, 4, new QTableWidgetItem(nomsPersonnel[row].toLower() + "@entreprise.com"));
-        tablePersonnel->setItem(row, 5, new QTableWidgetItem(roles[row]));
-        tablePersonnel->setItem(row, 6, new QTableWidgetItem("Actif"));
+    QString champ;
+    QVariant sqlValue;
 
-        // Créer une taille de bouton commune pour la cohérence
-        QSize buttonSize(30, 30);
-        QSize iconSize(20, 20);
-
-        // --- Colonne 7 : DOCUMENTS (centré) ---
-        QWidget *docsWidget = new QWidget();
-        QHBoxLayout *docsLayout = new QHBoxLayout(docsWidget);
-        docsLayout->setContentsMargins(0, 0, 0, 0);
-        docsLayout->setAlignment(Qt::AlignCenter);
-
-        QPushButton *btnDocs = new QPushButton();
-        btnDocs->setFlat(true);
-        btnDocs->setFixedSize(buttonSize);
-        btnDocs->setIcon(QIcon(":/icons/clip.png"));
-        btnDocs->setIconSize(iconSize);
-        btnDocs->setToolTip("Gérer les documents");
-        btnDocs->setStyleSheet("QPushButton { background-color: #5D6D7E; border-radius: 8px; border: none; } QPushButton:hover { background-color: #85929E; }");
-
-        docsLayout->addWidget(btnDocs);
-        tablePersonnel->setCellWidget(row, 7, docsWidget);
-
-        // --- Colonne 8 : PERMISSIONS (centré) ---
-        QWidget *permsWidget = new QWidget();
-        QHBoxLayout *permsLayout = new QHBoxLayout(permsWidget);
-        permsLayout->setContentsMargins(0, 0, 0, 0);
-        permsLayout->setAlignment(Qt::AlignCenter);
-
-        QPushButton *btnPerms = new QPushButton();
-        btnPerms->setFlat(true);
-        btnPerms->setFixedSize(buttonSize);
-        btnPerms->setIcon(QIcon(":/icons/shield.png"));
-        btnPerms->setIconSize(iconSize);
-        btnPerms->setToolTip("Gérer les permissions");
-        btnPerms->setStyleSheet("QPushButton { background-color: #884EA0; border-radius: 8px; border: none; } QPushButton:hover { background-color: #AF7AC5; }");
-
-        permsLayout->addWidget(btnPerms);
-        tablePersonnel->setCellWidget(row, 8, permsWidget);
-
-        // --- Colonne 9 : ACTIONS (centré) ---
-        QWidget *actionsWidget = new QWidget();
-        QHBoxLayout *actionsLayout = new QHBoxLayout(actionsWidget);
-        actionsLayout->setContentsMargins(0, 0, 0, 0);
-        actionsLayout->setSpacing(8);
-        actionsLayout->setAlignment(Qt::AlignCenter);
-
-        QPushButton *btnModif = new QPushButton();
-        btnModif->setFlat(true);
-        btnModif->setFixedSize(buttonSize);
-        btnModif->setIcon(QIcon(":/icons/pencil.png"));
-        btnModif->setIconSize(iconSize);
-        btnModif->setToolTip("Modifier l'employé");
-        btnModif->setStyleSheet("QPushButton { background-color: rgb(0, 0, 124); border-radius: 8px; border: none; } QPushButton:hover { background-color: #2980b9; }");
-
-        QPushButton *btnSupp = new QPushButton();
-        btnSupp->setFlat(true);
-        btnSupp->setFixedSize(buttonSize);
-        btnSupp->setIcon(QIcon(":/icons/trash.png"));
-        btnSupp->setIconSize(iconSize);
-        btnSupp->setToolTip("Supprimer l'employé");
-        btnSupp->setStyleSheet("QPushButton { background-color: #cd6155; border-radius: 8px; border: none; } QPushButton:hover { background-color: #c0392b; }");
-
-        actionsLayout->addWidget(btnModif);
-        actionsLayout->addWidget(btnSupp);
-        tablePersonnel->setCellWidget(row, 9, actionsWidget);
+    switch (col) {
+    case 1:
+        if (!Gestion_Fournisseur::isValidNom(value)) {
+            QMessageBox::warning(this, "Erreur", "Nom entreprise invalide !");
+            rafraichirTableauFournisseur();
+            return;
+        }
+        champ = "NOMENTURE"; sqlValue = value;
+        break;
+    case 2:
+        champ = "PERSONNE_CNT"; sqlValue = value.left(20);
+        break;
+    case 3:
+        champ = "ADRESSE"; sqlValue = value.left(20);
+        break;
+    case 4:
+        if (!value.toInt() || !Gestion_Fournisseur::isValidTelephone(value.toInt())) {
+            QMessageBox::warning(this, "Erreur", "Téléphone invalide !");
+            rafraichirTableauFournisseur();
+            return;
+        }
+        champ = "NUM_TEL"; sqlValue = value.toInt();
+        break;
+    case 5:
+        if (!Gestion_Fournisseur::isValidMail(value)) {
+            QMessageBox::warning(this, "Erreur", "Mail invalide !");
+            rafraichirTableauFournisseur();
+            return;
+        }
+        champ = "MAIL"; sqlValue = value;
+        break;
+    case 6:
+        if (!Gestion_Fournisseur::isValidCategorie(value)) {
+            QMessageBox::warning(this, "Erreur", "Catégorie invalide !");
+            rafraichirTableauFournisseur();
+            return;
+        }
+        champ = "CATÉGORIE"; sqlValue = value;
+        break;
+    case 7:
+    {
+        bool ok;
+        float note = value.toFloat(&ok);
+        if (!ok || note < 0 || note > 10) {
+            QMessageBox::warning(this, "Erreur", "Note invalide (0-10) !");
+            rafraichirTableauFournisseur();
+            return;
+        }
+        champ = "NOTE_DE_FIABILITÉ"; sqlValue = note;
+    }
+    break;
+    default: return;
     }
 
-    // ========== CONFIGURATION DE LA TABLE LOCAUX ==========
-    QTableWidget* tableLocaux = ui->tablePersonnel_2;
-
-    // Configuration du tableau
-    tableLocaux->setRowCount(8);
-
-    // Ajuster la largeur des colonnes
-    tableLocaux->setColumnWidth(0, 80);   // ID
-    tableLocaux->setColumnWidth(1, 120);  // Nom
-    tableLocaux->setColumnWidth(2, 100);  // Téléphone
-    tableLocaux->setColumnWidth(3, 150);  // Adresse
-    tableLocaux->setColumnWidth(4, 80);   // Superficie
-    tableLocaux->setColumnWidth(5, 120);  // Chiffre d'affaires
-    tableLocaux->setColumnWidth(6, 100);  // État
-    tableLocaux->setColumnWidth(7, 120);  // Actions
-
-    // Données d'exemple pour les locaux
-    QStringList nomsLocaux = {"Optique Centre-Ville", "Vision Plus", "Lunettes & Style", "Optique Modern", "Vision Express", "Optic 2000", "Grand Optical", "Atol Les Opticiens"};
-    QStringList telephones = {"01 42 68 53 09", "01 46 27 82 15", "01 48 74 36 91", "01 43 29 67 42", "01 45 78 23 56", "01 47 38 92 74", "01 44 65 39 81", "01 49 72 34 68"};
-    QStringList adresses = {"15 Rue de la République, Paris", "28 Avenue des Champs-Élysées, Paris", "7 Place Bellecour, Lyon", "42 Rue du Rhône, Genève", "89 Gran Via, Madrid", "56 Oxford Street, Londres", "23 Kurfürstendamm, Berlin", "12 Via Montenapoleone, Milan"};
-    QList<double> superficies = {85.5, 120.0, 65.0, 95.0, 110.0, 75.0, 140.0, 88.0};
-    QList<double> chiffresAffaires = {125000.0, 185000.0, 89000.0, 142000.0, 168000.0, 95000.0, 210000.0, 135000.0};
-    QStringList etats = {"Ouvert", "Ouvert", "Fermé", "Ouvert", "Disponible", "Ouvert", "Ouvert", "Fermé"};
-
-    for (int row = 0; row < tableLocaux->rowCount(); ++row) {
-        // Remplir les données des locaux
-        tableLocaux->setItem(row, 0, new QTableWidgetItem(QString::number(2000 + row)));
-        tableLocaux->setItem(row, 1, new QTableWidgetItem(nomsLocaux[row]));
-        tableLocaux->setItem(row, 2, new QTableWidgetItem(telephones[row]));
-        tableLocaux->setItem(row, 3, new QTableWidgetItem(adresses[row]));
-        tableLocaux->setItem(row, 4, new QTableWidgetItem(QString::number(superficies[row], 'f', 1) + " m²"));
-        tableLocaux->setItem(row, 5, new QTableWidgetItem(QString::number(chiffresAffaires[row], 'f', 0) + " €"));
-        tableLocaux->setItem(row, 6, new QTableWidgetItem(etats[row]));
-
-        // Créer les boutons d'action avec les mêmes icônes que la table Produits
-        QWidget *actionsWidget = new QWidget();
-        QHBoxLayout *actionsLayout = new QHBoxLayout(actionsWidget);
-        actionsLayout->setContentsMargins(0, 0, 0, 0);
-        actionsLayout->setSpacing(8);
-        actionsLayout->setAlignment(Qt::AlignCenter);
-
-        // Créer une taille de bouton commune pour la cohérence
-        QSize buttonSize(30, 30);
-        QSize iconSize(20, 20);
-
-        // Bouton Modifier (identique à la table Produits)
-        QPushButton *btnModif = new QPushButton();
-        btnModif->setFlat(true);
-        btnModif->setFixedSize(buttonSize);
-        btnModif->setIcon(QIcon(":/icons/pencil.png"));
-        btnModif->setIconSize(iconSize);
-        btnModif->setToolTip("Modifier le local");
-        btnModif->setStyleSheet("QPushButton { background-color: rgb(0, 0, 124); border-radius: 8px; border: none; } QPushButton:hover { background-color: #2980b9; }");
-
-        // Bouton Supprimer (identique à la table Produits)
-        QPushButton *btnSupp = new QPushButton();
-        btnSupp->setFlat(true);
-        btnSupp->setFixedSize(buttonSize);
-        btnSupp->setIcon(QIcon(":/icons/trash.png"));
-        btnSupp->setIconSize(iconSize);
-        btnSupp->setToolTip("Supprimer le local");
-        btnSupp->setStyleSheet("QPushButton { background-color: #cd6155; border-radius: 8px; border: none; } QPushButton:hover { background-color: #c0392b; }");
-
-        // Connecter les boutons à des actions
-        connect(btnModif, &QPushButton::clicked, [=]() {
-            QMessageBox::information(this, "Modification", "Modifier le local: " + nomsLocaux[row]);
-        });
-
-        connect(btnSupp, &QPushButton::clicked, [=]() {
-            QMessageBox::warning(this, "Suppression", "Supprimer le local: " + nomsLocaux[row]);
-        });
-
-        actionsLayout->addWidget(btnModif);
-        actionsLayout->addWidget(btnSupp);
-        tableLocaux->setCellWidget(row, 7, actionsWidget);
+    Connection c;
+    if (!c.createconnect()) {
+        QMessageBox::critical(this, "Erreur", "Connexion échouée !");
+        return;
     }
 
-    // Ajuster la hauteur des lignes
-    tableLocaux->verticalHeader()->setDefaultSectionSize(45);
+    QSqlQuery q;
+    q.prepare(QString("UPDATE FOURNISSEUR SET %1 = :val WHERE ID_FOURNISSEUR = :id").arg(champ));
+    q.bindValue(":val", sqlValue);
+    q.bindValue(":id", id);
 
-    // ========== CONFIGURATION DE LA TABLE PRODUITS ==========
-    QTableWidget* tableProduits = ui->tablePersonnel_3;
+    if (!q.exec()) {
+        QMessageBox::critical(this, "Erreur", "Échec : " + q.lastError().text());
+        rafraichirTableauFournisseur();
+    }
+}
 
-    // Configuration du tableau
-    tableProduits->setRowCount(8);
+//===================== TABLE PRODUIT ITEM CHANGED =====================
+void MainWindow::onTableProduitItemChanged(QTableWidgetItem *item)
+{
+    if (!item || item->column() == 0 || item->column() == 10) return;
 
-    // Ajuster la largeur des colonnes
-    tableProduits->setColumnWidth(0, 80);   // ID Produit
-    tableProduits->setColumnWidth(1, 100);  // Marque
-    tableProduits->setColumnWidth(2, 100);  // Modèle
-    tableProduits->setColumnWidth(3, 80);   // Type
-    tableProduits->setColumnWidth(4, 80);   // Couleur
-    tableProduits->setColumnWidth(5, 80);   // Prix
-    tableProduits->setColumnWidth(6, 80);   // Quantité
-    tableProduits->setColumnWidth(7, 100);  // Date d'ajout
-    tableProduits->setColumnWidth(8, 120);  // Actions (réduit car seulement 2 boutons)
+    int row = item->row();
+    int col = item->column();
+    int id = ui->produit->item(row, 0)->text().toInt();
+    QString value = item->text().trimmed();
 
-    // Données d'exemple pour les produits
-    QStringList marques = {"Ray-Ban", "Oakley", "Persol", "Gucci", "Prada", "Dior", "Chanel", "Versace"};
-    QStringList modeles = {"Aviator", "Frogskins", "PO0649", "GG0286O", "PR16WV", "DIORSTELLAIRE", "CH5348", "VE4285"};
-    QStringList types = {"Solaire", "Vue", "Mixte", "Solaire", "Vue", "Mixte", "Solaire", "Lentille"};
-    QStringList couleurs = {"Noir", "Tortue", "Brun", "Or", "Argent", "Rose", "Bleu", "Vert"};
-    QList<double> prix = {150.0, 120.0, 200.0, 350.0, 280.0, 320.0, 400.0, 85.0};
-    QList<int> quantites = {15, 8, 5, 3, 12, 6, 2, 25};
-    QStringList dates = {"2024-01-15", "2024-01-20", "2024-02-01", "2024-02-10", "2024-02-15", "2024-03-01", "2024-03-05", "2024-03-10"};
+    QString champ;
+    QVariant sqlValue;
 
-    for (int row = 0; row < tableProduits->rowCount(); ++row) {
-        // Remplir les données des produits
-        tableProduits->setItem(row, 0, new QTableWidgetItem(QString::number(1000 + row)));
-        tableProduits->setItem(row, 1, new QTableWidgetItem(marques[row]));
-        tableProduits->setItem(row, 2, new QTableWidgetItem(modeles[row]));
-        tableProduits->setItem(row, 3, new QTableWidgetItem(types[row]));
-        tableProduits->setItem(row, 4, new QTableWidgetItem(couleurs[row]));
-        tableProduits->setItem(row, 5, new QTableWidgetItem(QString::number(prix[row], 'f', 2) + " €"));
-        tableProduits->setItem(row, 6, new QTableWidgetItem(QString::number(quantites[row])));
-        tableProduits->setItem(row, 7, new QTableWidgetItem(dates[row]));
-
-        // Créer les boutons d'action avec les mêmes icônes que la table Personnel
-        QWidget *actionsWidget = new QWidget();
-        QHBoxLayout *actionsLayout = new QHBoxLayout(actionsWidget);
-        actionsLayout->setContentsMargins(0, 0, 0, 0);
-        actionsLayout->setSpacing(8);
-        actionsLayout->setAlignment(Qt::AlignCenter);
-
-        // Créer une taille de bouton commune pour la cohérence
-        QSize buttonSize(30, 30);
-        QSize iconSize(20, 20);
-
-        // Bouton Modifier (identique à la table Personnel)
-        QPushButton *btnModif = new QPushButton();
-        btnModif->setFlat(true);
-        btnModif->setFixedSize(buttonSize);
-        btnModif->setIcon(QIcon(":/icons/pencil.png"));
-        btnModif->setIconSize(iconSize);
-        btnModif->setToolTip("Modifier le produit");
-        btnModif->setStyleSheet("QPushButton { background-color: rgb(0, 0, 124); border-radius: 8px; border: none; } QPushButton:hover { background-color: #2980b9; }");
-
-        // Bouton Supprimer (identique à la table Personnel)
-        QPushButton *btnSupp = new QPushButton();
-        btnSupp->setFlat(true);
-        btnSupp->setFixedSize(buttonSize);
-        btnSupp->setIcon(QIcon(":/icons/trash.png"));
-        btnSupp->setIconSize(iconSize);
-        btnSupp->setToolTip("Supprimer le produit");
-        btnSupp->setStyleSheet("QPushButton { background-color: #cd6155; border-radius: 8px; border: none; } QPushButton:hover { background-color: #c0392b; }");
-
-        // Connecter les boutons à des actions
-        connect(btnModif, &QPushButton::clicked, [=]() {
-            QMessageBox::information(this, "Modification", "Modifier le produit: " + marques[row] + " " + modeles[row]);
-        });
-
-        connect(btnSupp, &QPushButton::clicked, [=]() {
-            QMessageBox::warning(this, "Suppression", "Supprimer le produit: " + marques[row] + " " + modeles[row]);
-        });
-
-        actionsLayout->addWidget(btnModif);
-        actionsLayout->addWidget(btnSupp);
-        tableProduits->setCellWidget(row, 8, actionsWidget);
+    switch (col) {
+    case 1:
+        if (!Gestion_Produit::isValidMarque(value)) {
+            QMessageBox::warning(this, "Erreur", "Marque invalide !");
+            rafraichirTableauProduit();
+            return;
+        }
+        champ = "MARQUE"; sqlValue = value;
+        break;
+    case 2:
+        if (!Gestion_Produit::isValidModele(value)) {
+            QMessageBox::warning(this, "Erreur", "Modèle invalide !");
+            rafraichirTableauProduit();
+            return;
+        }
+        champ = "MODELE"; sqlValue = value;
+        break;
+    case 3:
+        if (!Gestion_Produit::isValidType(value)) {
+            QMessageBox::warning(this, "Erreur", "Type invalide !");
+            rafraichirTableauProduit();
+            return;
+        }
+        champ = "TYPE"; sqlValue = value;
+        break;
+    case 4:
+        champ = "COULEUR"; sqlValue = value.left(20);
+        break;
+    case 5:
+    {
+        bool ok;
+        float prix = value.toFloat(&ok);
+        if (!ok || !Gestion_Produit::isValidPrix(prix)) {
+            QMessageBox::warning(this, "Erreur", "Prix invalide !");
+            rafraichirTableauProduit();
+            return;
+        }
+        champ = "PRIX"; sqlValue = prix;
+    }
+    break;
+    case 6:
+    {
+        bool ok;
+        float remise = value.toFloat(&ok);
+        if (!ok || remise < 0 || remise > 100) {
+            QMessageBox::warning(this, "Erreur", "Remise invalide (0-100) !");
+            rafraichirTableauProduit();
+            return;
+        }
+        champ = "REMISE"; sqlValue = remise;
+    }
+    break;
+    case 7:
+    {
+        bool ok;
+        int quantite = value.toInt(&ok);
+        if (!ok || !Gestion_Produit::isValidQuantite(quantite)) {
+            QMessageBox::warning(this, "Erreur", "Quantité invalide !");
+            rafraichirTableauProduit();
+            return;
+        }
+        champ = "QUANTITÉ"; sqlValue = quantite;
+    }
+    break;
+    case 8:
+        champ = "MATIERE"; sqlValue = value.left(20);
+        break;
+    case 9:
+        champ = "GENRE"; sqlValue = value.left(20);
+        break;
+    default: return;
     }
 
-    // Ajuster la hauteur des lignes
-    tableProduits->verticalHeader()->setDefaultSectionSize(45);
+    Connection c;
+    if (!c.createconnect()) {
+        QMessageBox::critical(this, "Erreur", "Connexion échouée !");
+        return;
+    }
+
+    QSqlQuery q;
+    q.prepare(QString("UPDATE PRODUIT SET %1 = :val WHERE ID_PRODUIT = :id").arg(champ));
+    q.bindValue(":val", sqlValue);
+    q.bindValue(":id", id);
+
+    if (!q.exec()) {
+        QMessageBox::critical(this, "Erreur", "Échec : " + q.lastError().text());
+        rafraichirTableauProduit();
+    }
 }
 
-// IMPLÉMENTATION DES SLOTS POUR LA NAVIGATION PRINCIPALE
-void MainWindow::showClientInterface()
+//===================== TABLE CLIENTS SEARCH =====================
+void MainWindow::on_searchLineEdit_3_textChanged(const QString &text)
 {
-    ui->stackedWidget->setCurrentWidget(ui->clients);
-    ui->stackedWidget_4->setCurrentIndex(0);
+    QString filter = text.trimmed();
+    QString filtreActif = ui->comboProfession_3->currentText();
+
+    for (int i = 0; i < ui->clients->rowCount(); ++i) {
+        bool show = true;
+        if (filtreActif != "Tous les filtres") show = ligneCorrespondFiltre(i, filtreActif);
+
+        if (show && !filter.isEmpty()) {
+            QString id = ui->clients->item(i, 0)->text();
+            QString nom = ui->clients->item(i, 1)->text();
+            QString prenom = ui->clients->item(i, 2)->text();
+            show = id.contains(filter, Qt::CaseInsensitive) ||
+                   nom.contains(filter, Qt::CaseInsensitive) ||
+                   prenom.contains(filter, Qt::CaseInsensitive);
+        }
+
+        ui->clients->setRowHidden(i, !show);
+    }
 }
 
-void MainWindow::showPersonnelInterface()
+//===================== PDF EXPORT =====================
+void MainWindow::on_btnExporter_3_clicked()
 {
-    ui->stackedWidget->setCurrentWidget(ui->personnel);
-    ui->stackedWidget_3->setCurrentIndex(0);
+    QString fileName = QFileDialog::getSaveFileName(this, "Exporter PDF", "clients.pdf", "PDF (*.pdf)");
+    if (fileName.isEmpty()) return;
+
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(fileName);
+    printer.setPageSize(QPageSize::A4);
+    printer.setPageMargins(QMarginsF(15, 15, 15, 15), QPageLayout::Millimeter);
+
+    QTextDocument doc;
+    QTextCursor cursor(&doc);
+    cursor.insertHtml("<h1 style='text-align:center;'>Liste des Clients</h1><br>");
+
+    int visibleRows = 0;
+    for (int i = 0; i < ui->clients->rowCount(); ++i)
+        if (!ui->clients->isRowHidden(i)) visibleRows++;
+
+    QTextTableFormat tableFormat;
+    tableFormat.setBorder(1);
+    tableFormat.setCellPadding(5);
+    tableFormat.setAlignment(Qt::AlignCenter);
+    tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 100));
+
+    QTextTable *table = cursor.insertTable(visibleRows + 1, 7, tableFormat);
+    QStringList headers = {"ID", "Nom", "Prénom", "Âge", "Statut", "Téléphone", "Sexe"};
+    QTextCharFormat headerFmt; headerFmt.setFontWeight(QFont::Bold); headerFmt.setBackground(Qt::lightGray);
+
+    for (int col = 0; col < 7; ++col) table->cellAt(0, col).firstCursorPosition().insertText(headers[col], headerFmt);
+
+    int pdfRow = 1;
+    for (int row = 0; row < ui->clients->rowCount(); ++row) {
+        if (ui->clients->isRowHidden(row)) continue;
+        for (int col = 0; col < 7; ++col) {
+            QString text = ui->clients->item(row, col) ? ui->clients->item(row, col)->text() : "";
+            table->cellAt(pdfRow, col).firstCursorPosition().insertText(text);
+        }
+        pdfRow++;
+    }
+
+    doc.print(&printer);
+    QMessageBox::information(this, "Succès", "PDF exporté avec succès !");
 }
 
-void MainWindow::showLocauxInterface()
+//===================== CLIENT DOUBLE CLICK =====================
+void MainWindow::on_tableClients_doubleClicked(const QModelIndex &index)
 {
-    ui->stackedWidget->setCurrentWidget(ui->locaux);
-    ui->stackedWidget_2->setCurrentIndex(0);
+    int row = index.row();
+    int col = index.column();
+    if (col != 0) return;
+
+    int clientId = ui->clients->item(row, 0)->text().toInt();
+    chargerEtAfficherClient(clientId);
 }
 
-// NOUVELLES IMPLÉMENTATIONS POUR FOURNISSEURS ET PRODUITS
-void MainWindow::showFournisseurInterface()
+void MainWindow::chargerEtAfficherClient(int id)
 {
-    ui->stackedWidget->setCurrentWidget(ui->fournisseur);
-    ui->stackedWidget_5->setCurrentIndex(0);
+    bool clientTrouve = false;
+    gestion_client client;
+
+    for (int row = 0; row < ui->clients->rowCount(); ++row) {
+        QTableWidgetItem *idItem = ui->clients->item(row, 0);
+        if (idItem && idItem->text().toInt() == id) {
+            clientTrouve = true;
+            client.setId(id);
+            client.setNom(ui->clients->item(row, 1)->text());
+            client.setPrenom(ui->clients->item(row, 2)->text());
+            client.setTelephone(ui->clients->item(row, 5)->text().toInt());
+            client.setStatut(ui->clients->item(row, 4)->text());
+            client.setSexe(ui->clients->item(row, 6)->text());
+            break;
+        }
+    }
+
+    if (!clientTrouve) {
+        QMessageBox::warning(this, "Erreur", "Client non trouvé dans le tableau !");
+        return;
+    }
+
+    ui->stackedWidget_4->setCurrentIndex(2);
+    ui->lineEditID_3->setText(QString::number(client.getId()));
+    ui->lineEditNom_4->setText(client.getNom());
+    ui->lineEditPrenom_3->setText(client.getPrenom());
+    ui->lineEditPhone_3->setText(QString::number(client.getTelephone()));
+
+    if (client.getSexe() == "H") ui->comboSexe_2->setCurrentText("Homme");
+    else ui->comboSexe_2->setCurrentText("Femme");
+
+    QString statut = client.getStatut();
+    ui->checkNew_2->setChecked(statut == "Nouveau");
+    ui->checkOld_2->setChecked(statut == "Ancien");
+    ui->checkVIP_2->setChecked(statut == "VIP");
+
+    ui->lineEditID_3->setEnabled(false);
+    ui->btnConfirmer_3->setText("Modifier le client");
 }
 
-void MainWindow::showProduitsInterface()
-{
-    ui->stackedWidget->setCurrentWidget(ui->produits);
-    ui->stackedWidget_6->setCurrentIndex(0);
+//===================== VALIDATION =====================
+void MainWindow::validerID(const QString &text) {
+    bool ok;
+    int id = text.toInt(&ok);
+    bool valid = ok && text.length() == 8 && id > 0;
+    ui->lineEditID_3->setStyleSheet(valid ? "border: 2px solid green;" : "border: 2px solid red; background-color: #FFE6E6;");
 }
 
-MainWindow::~MainWindow()
-{
+void MainWindow::validerNom(const QString &text) {
+    ui->lineEditNom_4->setStyleSheet(text.isEmpty() || gestion_client::isValidNom(text) ? "border: 2px solid green;" : "border: 2px solid red; background-color: #FFE6E6;");
+}
+
+void MainWindow::validerPrenom(const QString &text) {
+    ui->lineEditPrenom_3->setStyleSheet(text.isEmpty() || gestion_client::isValidPrenom(text) ? "border: 2px solid green;" : "border: 2px solid red; background-color: #FFE6E6;");
+}
+
+void MainWindow::validerTelephone(const QString &text) {
+    bool ok;
+    bool valid = text.toInt(&ok) && text.length() == 8;
+    ui->lineEditPhone_3->setStyleSheet(valid ? "border: 2px solid green;" : "border: 2px solid red; background-color: #FFE6E6;");
+}
+
+MainWindow::~MainWindow() {
     delete ui;
 }
