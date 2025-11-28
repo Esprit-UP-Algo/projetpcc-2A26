@@ -411,6 +411,7 @@ Makefile: projetqt.pro C:/Qt/6.7.3/mingw_64/mkspecs/win32-g++/qmake.conf C:/Qt/6
 		projetqt.pro \
 		C:/Qt/6.7.3/mingw_64/lib/Qt6Quick.prl \
 		C:/Qt/6.7.3/mingw_64/lib/Qt6OpenGL.prl \
+		C:/Qt/6.7.3/mingw_64/lib/Qt6PrintSupport.prl \
 		C:/Qt/6.7.3/mingw_64/lib/Qt6Widgets.prl \
 		C:/Qt/6.7.3/mingw_64/lib/Qt6Gui.prl \
 		C:/Qt/6.7.3/mingw_64/lib/Qt6QmlModels.prl \
@@ -768,6 +769,7 @@ C:/Qt/6.7.3/mingw_64/mkspecs/features/lex.prf:
 projetqt.pro:
 C:/Qt/6.7.3/mingw_64/lib/Qt6Quick.prl:
 C:/Qt/6.7.3/mingw_64/lib/Qt6OpenGL.prl:
+C:/Qt/6.7.3/mingw_64/lib/Qt6PrintSupport.prl:
 C:/Qt/6.7.3/mingw_64/lib/Qt6Widgets.prl:
 C:/Qt/6.7.3/mingw_64/lib/Qt6Gui.prl:
 C:/Qt/6.7.3/mingw_64/lib/Qt6QmlModels.prl:

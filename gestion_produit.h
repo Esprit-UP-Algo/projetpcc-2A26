@@ -18,7 +18,6 @@ public:
                     const QString &genre, const QDate &dateAjout,
                     int idClient, int idFournisseur, int idLocal);
 
-    // Getters
     int getId() const;
     QString getMarque() const;
     QString getModele() const;
@@ -34,7 +33,6 @@ public:
     int getIdFournisseur() const;
     int getIdLocal() const;
 
-    // Setters
     bool setId(int id);
     bool setMarque(const QString &marque);
     bool setModele(const QString &modele);
@@ -50,7 +48,6 @@ public:
     bool setIdFournisseur(int idFournisseur);
     bool setIdLocal(int idLocal);
 
-    // CRUD
     static bool ajouterProduit(int id, const QString &marque, const QString &modele,
                                const QString &type, const QString &couleur, float prix,
                                float remise, int quantite, const QString &matiere,
@@ -67,7 +64,6 @@ public:
                                 int idClient, int idFournisseur, int idLocal,
                                 QString &erreurMessage);
 
-    // Validation
     bool isValid() const;
     static bool isValidId(int id);
     static bool isValidMarque(const QString &marque);
@@ -93,4 +89,4 @@ private:
     int m_idLocal;
 };
 
-#endif // GESTION_PRODUIT_H
+#endif

@@ -1,3 +1,5 @@
+debug/StatisticsWidgetProduit.o
+debug/apiremises.o
 debug/connection.o
 debug/gestion_client.o
 debug/gestion_fournisseur.o
@@ -6,6 +8,8 @@ debug/gestion_locaux.o
 debug/gestion_produit.o
 debug/main.o
 debug/mainwindow.o
+debug/sms_client.o
+debug/statisticswidget.o
 debug/qrc_M.o
 debug/qrc_Mpower.o
 debug/qrc_amg.o
@@ -13,4 +17,8 @@ debug/qrc_img.o
 debug/qrc_img2.o
 debug/qrc_mm.o
 debug/qrc_resources.o
+debug/moc_StatisticsWidgetProduit.o
+debug/moc_apiremises.o
 debug/moc_mainwindow.o
+debug/moc_sms_client.o
+debug/moc_statisticswidget.o

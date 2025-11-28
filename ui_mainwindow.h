@@ -20,7 +20,6 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
@@ -28,7 +27,6 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTableWidget>
-#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -77,7 +75,6 @@ public:
     QHBoxLayout *actionButtonsLayout;
     QPushButton *btnListePersonnel_3;
     QPushButton *btnAjouterPersonnel_3;
-    QLabel *label_16;
     QFrame *frame_2;
     QWidget *page_2;
     QWidget *page_6;
@@ -211,14 +208,13 @@ public:
     QCheckBox *checkVIP_2;
     QComboBox *comboSexe_2;
     QLabel *lblphoto;
-    QTextEdit *textEdit;
     QLabel *lblordo;
     QLabel *lblpdp;
     QLabel *lblordo_2;
-    QListWidget *listachatrecents;
     QDateEdit *lineEditDateNaissance_4;
     QLineEdit *lineEditPhoto;
     QLineEdit *lineEditOrdonnance;
+    QPushButton *pushButton;
     QPushButton *btnAjouterClient_5;
     QPushButton *btnListeClients_5;
     QWidget *fournisseur;
@@ -237,9 +233,7 @@ public:
     QToolButton *toolButton_25;
     QToolButton *toolButton_26;
     QLineEdit *searchLineEdit_4;
-    QPushButton *btnRechercher_4;
     QComboBox *comboProfession_4;
-    QPushButton *btnFilter_4;
     QPushButton *btnExporter_4;
     QHBoxLayout *headerLayout_8;
     QTableWidget *tableClients_2;
@@ -255,19 +249,25 @@ public:
     QLabel *lblid_4;
     QLabel *lblnom_5;
     QLabel *lblprenom_4;
-    QLabel *lbltel_4;
-    QLabel *lblbirth_4;
     QWidget *layoutWidget_4;
     QHBoxLayout *ajouterActionLayout_4;
     QPushButton *btnConfirmer_4;
     QPushButton *btnAnnuler_4;
-    QLineEdit *lineEditNom_5;
-    QLineEdit *lineEditPhone_4;
-    QLineEdit *lineEditDateNaissance_5;
-    QLineEdit *lineEditID_4;
+    QLineEdit *nomentre;
+    QLineEdit *id_fournisseur;
     QComboBox *comboCategorie;
-    QLineEdit *lineEditPhone_5;
+    QLineEdit *ADRESSE;
     QLabel *lbltel_5;
+    QLabel *lbltel_6;
+    QLineEdit *PERSONNE_CNT;
+    QLabel *lblbirth_5;
+    QLineEdit *telephone;
+    QLineEdit *MAIL;
+    QLabel *lblbirth_6;
+    QLineEdit *DETAILS;
+    QLabel *lblbirth_9;
+    QLabel *lblbirth_10;
+    QLineEdit *NOTEDEFIABILITE;
     QPushButton *btnAjouterClient_7;
     QPushButton *btnListeClients_7;
     QWidget *produits;
@@ -286,28 +286,19 @@ public:
     QToolButton *toolButton_30;
     QToolButton *toolButton_31;
     QLineEdit *searchLineEdit_5;
-    QPushButton *btnRechercher_5;
     QComboBox *comboProfession_5;
-    QPushButton *btnFilter_5;
     QPushButton *btnExporter_5;
     QHBoxLayout *headerLayout_10;
     QTableWidget *tablePersonnel_3;
+    QLabel *label_33;
     QHBoxLayout *actionButtonsLayout_5;
     QPushButton *btnListePersonnel_5;
     QPushButton *btnAjouterPersonnel_5;
-    QLabel *label_32;
-    QFrame *frame_18;
-    QLabel *label_33;
-    QLabel *label_34;
     QWidget *page_14;
     QWidget *page_15;
     QWidget *page_16;
     QPushButton *btnAjouterClient_8;
     QPushButton *btnListeClients_8;
-    QLabel *label_29;
-    QFrame *frame_17;
-    QLabel *label_18;
-    QTableWidget *tableWidget;
     QFrame *frameFicheClient_5;
     QLabel *lblFicheClient_5;
     QLabel *label_5;
@@ -338,6 +329,7 @@ public:
     QComboBox *comboProfession_7;
     QComboBox *comboProfession_8;
     QLabel *label_38;
+    QCheckBox *checkBoxAI;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -711,13 +703,6 @@ public:
 "    background-color: #5a4a82;\n"
 "    border: 2px solid #7158a0;\n"
 "}"));
-        label_16 = new QLabel(page);
-        label_16->setObjectName("label_16");
-        label_16->setGeometry(QRect(1220, 20, 211, 31));
-        label_16->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);\n"
-"background-color: rgb(0, 0, 127);\n"
-"border-color: rgb(0, 0, 255);"));
-        label_16->setAlignment(Qt::AlignmentFlag::AlignCenter);
         frame_2 = new QFrame(page);
         frame_2->setObjectName("frame_2");
         frame_2->setGeometry(QRect(1220, 50, 211, 711));
@@ -1678,22 +1663,9 @@ public:
 "    background-color: #e9ecef;\n"
 "}"));
         lblphoto->setPixmap(QPixmap(QString::fromUtf8(":/new/prefix1/uplode-removebg-preview.png")));
-        textEdit = new QTextEdit(frameFicheClient_3);
-        textEdit->setObjectName("textEdit");
-        textEdit->setGeometry(QRect(790, 370, 121, 31));
-        textEdit->setStyleSheet(QString::fromUtf8("QTextEdit {\n"
-"    border: 2px solid #dfe6e9;\n"
-"    border-radius: 10px;\n"
-"    padding: 10px;\n"
-"    background-color: white;\n"
-"    font-size: 14px;\n"
-"}\n"
-"QTextEdit:focus {\n"
-"    border: 2px solid #6c5ce7;\n"
-"}"));
         lblordo = new QLabel(frameFicheClient_3);
         lblordo->setObjectName("lblordo");
-        lblordo->setGeometry(QRect(580, 380, 151, 20));
+        lblordo->setGeometry(QRect(580, 340, 151, 20));
         lblordo->setStyleSheet(QString::fromUtf8("border-color: rgb(255, 255, 255);\n"
 "color: rgb(0, 0, 127);\n"
 ""));
@@ -1709,25 +1681,6 @@ public:
         lblordo_2->setStyleSheet(QString::fromUtf8("border-color: rgb(255, 255, 255);\n"
 "color: rgb(0, 0, 127);\n"
 ""));
-        listachatrecents = new QListWidget(frameFicheClient_3);
-        listachatrecents->setObjectName("listachatrecents");
-        listachatrecents->setGeometry(QRect(790, 430, 201, 91));
-        listachatrecents->setStyleSheet(QString::fromUtf8("QListWidget {\n"
-"    background-color: white;\n"
-"    border: 2px solid #dfe6e9;\n"
-"    border-radius: 10px;\n"
-"    padding: 10px;\n"
-"    font-size: 14px;\n"
-"    color: #2d3436;\n"
-"}\n"
-"QListWidget::item {\n"
-"    padding: 8px;\n"
-"    border-bottom: 1px solid #dfe6e9;\n"
-"}\n"
-"QListWidget::item:selected {\n"
-"    background-color: #a29bfe;\n"
-"    color: white;\n"
-"}"));
         lineEditDateNaissance_4 = new QDateEdit(frameFicheClient_3);
         lineEditDateNaissance_4->setObjectName("lineEditDateNaissance_4");
         lineEditDateNaissance_4->setGeometry(QRect(230, 360, 251, 29));
@@ -1738,8 +1691,11 @@ public:
         lineEditPhoto->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         lineEditOrdonnance = new QLineEdit(frameFicheClient_3);
         lineEditOrdonnance->setObjectName("lineEditOrdonnance");
-        lineEditOrdonnance->setGeometry(QRect(800, 340, 113, 28));
+        lineEditOrdonnance->setGeometry(QRect(800, 340, 111, 28));
         lineEditOrdonnance->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
+        pushButton = new QPushButton(frameFicheClient_3);
+        pushButton->setObjectName("pushButton");
+        pushButton->setGeometry(QRect(920, 340, 90, 29));
         btnAjouterClient_5 = new QPushButton(page_9);
         btnAjouterClient_5->setObjectName("btnAjouterClient_5");
         btnAjouterClient_5->setGeometry(QRect(650, 10, 331, 41));
@@ -1842,11 +1798,6 @@ public:
 
         searchLayout_4->addWidget(searchLineEdit_4);
 
-        btnRechercher_4 = new QPushButton(frame_10);
-        btnRechercher_4->setObjectName("btnRechercher_4");
-
-        searchLayout_4->addWidget(btnRechercher_4);
-
         comboProfession_4 = new QComboBox(frame_10);
         comboProfession_4->addItem(QString());
         comboProfession_4->addItem(QString());
@@ -1856,12 +1807,6 @@ public:
         comboProfession_4->setEditable(false);
 
         searchLayout_4->addWidget(comboProfession_4);
-
-        btnFilter_4 = new QPushButton(frame_10);
-        btnFilter_4->setObjectName("btnFilter_4");
-        btnFilter_4->setStyleSheet(QString::fromUtf8("background-color:#a55eea;color:white;font-weight:bold;border-radius:10px;padding:8px 16px;font-size:14px;"));
-
-        searchLayout_4->addWidget(btnFilter_4);
 
         btnExporter_4 = new QPushButton(frame_10);
         btnExporter_4->setObjectName("btnExporter_4");
@@ -1875,8 +1820,8 @@ public:
         headerLayout_8 = new QHBoxLayout();
         headerLayout_8->setObjectName("headerLayout_8");
         tableClients_2 = new QTableWidget(frame_10);
-        if (tableClients_2->columnCount() < 7)
-            tableClients_2->setColumnCount(7);
+        if (tableClients_2->columnCount() < 9)
+            tableClients_2->setColumnCount(9);
         QTableWidgetItem *__qtablewidgetitem79 = new QTableWidgetItem();
         tableClients_2->setHorizontalHeaderItem(0, __qtablewidgetitem79);
         QTableWidgetItem *__qtablewidgetitem80 = new QTableWidgetItem();
@@ -1891,53 +1836,57 @@ public:
         tableClients_2->setHorizontalHeaderItem(5, __qtablewidgetitem84);
         QTableWidgetItem *__qtablewidgetitem85 = new QTableWidgetItem();
         tableClients_2->setHorizontalHeaderItem(6, __qtablewidgetitem85);
+        QTableWidgetItem *__qtablewidgetitem86 = new QTableWidgetItem();
+        tableClients_2->setHorizontalHeaderItem(7, __qtablewidgetitem86);
+        QTableWidgetItem *__qtablewidgetitem87 = new QTableWidgetItem();
+        tableClients_2->setHorizontalHeaderItem(8, __qtablewidgetitem87);
         if (tableClients_2->rowCount() < 8)
             tableClients_2->setRowCount(8);
-        QTableWidgetItem *__qtablewidgetitem86 = new QTableWidgetItem();
-        tableClients_2->setItem(0, 0, __qtablewidgetitem86);
-        QTableWidgetItem *__qtablewidgetitem87 = new QTableWidgetItem();
-        tableClients_2->setItem(0, 1, __qtablewidgetitem87);
         QTableWidgetItem *__qtablewidgetitem88 = new QTableWidgetItem();
-        tableClients_2->setItem(0, 2, __qtablewidgetitem88);
+        tableClients_2->setItem(0, 0, __qtablewidgetitem88);
         QTableWidgetItem *__qtablewidgetitem89 = new QTableWidgetItem();
-        __qtablewidgetitem89->setCheckState(Qt::Checked);
-        tableClients_2->setItem(0, 3, __qtablewidgetitem89);
+        tableClients_2->setItem(0, 1, __qtablewidgetitem89);
         QTableWidgetItem *__qtablewidgetitem90 = new QTableWidgetItem();
-        tableClients_2->setItem(0, 4, __qtablewidgetitem90);
+        tableClients_2->setItem(0, 2, __qtablewidgetitem90);
         QTableWidgetItem *__qtablewidgetitem91 = new QTableWidgetItem();
-        tableClients_2->setItem(0, 5, __qtablewidgetitem91);
+        __qtablewidgetitem91->setCheckState(Qt::Checked);
+        tableClients_2->setItem(0, 4, __qtablewidgetitem91);
         QTableWidgetItem *__qtablewidgetitem92 = new QTableWidgetItem();
-        tableClients_2->setItem(0, 6, __qtablewidgetitem92);
+        tableClients_2->setItem(0, 5, __qtablewidgetitem92);
         QTableWidgetItem *__qtablewidgetitem93 = new QTableWidgetItem();
-        tableClients_2->setItem(1, 0, __qtablewidgetitem93);
+        tableClients_2->setItem(0, 6, __qtablewidgetitem93);
         QTableWidgetItem *__qtablewidgetitem94 = new QTableWidgetItem();
-        tableClients_2->setItem(1, 1, __qtablewidgetitem94);
+        tableClients_2->setItem(0, 7, __qtablewidgetitem94);
         QTableWidgetItem *__qtablewidgetitem95 = new QTableWidgetItem();
-        tableClients_2->setItem(1, 2, __qtablewidgetitem95);
+        tableClients_2->setItem(1, 0, __qtablewidgetitem95);
         QTableWidgetItem *__qtablewidgetitem96 = new QTableWidgetItem();
-        __qtablewidgetitem96->setCheckState(Qt::Checked);
-        tableClients_2->setItem(1, 3, __qtablewidgetitem96);
+        tableClients_2->setItem(1, 1, __qtablewidgetitem96);
         QTableWidgetItem *__qtablewidgetitem97 = new QTableWidgetItem();
-        tableClients_2->setItem(1, 4, __qtablewidgetitem97);
+        tableClients_2->setItem(1, 2, __qtablewidgetitem97);
         QTableWidgetItem *__qtablewidgetitem98 = new QTableWidgetItem();
-        tableClients_2->setItem(1, 5, __qtablewidgetitem98);
+        __qtablewidgetitem98->setCheckState(Qt::Checked);
+        tableClients_2->setItem(1, 4, __qtablewidgetitem98);
         QTableWidgetItem *__qtablewidgetitem99 = new QTableWidgetItem();
-        tableClients_2->setItem(1, 6, __qtablewidgetitem99);
+        tableClients_2->setItem(1, 5, __qtablewidgetitem99);
         QTableWidgetItem *__qtablewidgetitem100 = new QTableWidgetItem();
-        tableClients_2->setItem(2, 0, __qtablewidgetitem100);
+        tableClients_2->setItem(1, 6, __qtablewidgetitem100);
         QTableWidgetItem *__qtablewidgetitem101 = new QTableWidgetItem();
-        tableClients_2->setItem(2, 1, __qtablewidgetitem101);
+        tableClients_2->setItem(1, 7, __qtablewidgetitem101);
         QTableWidgetItem *__qtablewidgetitem102 = new QTableWidgetItem();
-        tableClients_2->setItem(2, 2, __qtablewidgetitem102);
+        tableClients_2->setItem(2, 0, __qtablewidgetitem102);
         QTableWidgetItem *__qtablewidgetitem103 = new QTableWidgetItem();
-        __qtablewidgetitem103->setCheckState(Qt::Checked);
-        tableClients_2->setItem(2, 3, __qtablewidgetitem103);
+        tableClients_2->setItem(2, 1, __qtablewidgetitem103);
         QTableWidgetItem *__qtablewidgetitem104 = new QTableWidgetItem();
-        tableClients_2->setItem(2, 4, __qtablewidgetitem104);
+        tableClients_2->setItem(2, 2, __qtablewidgetitem104);
         QTableWidgetItem *__qtablewidgetitem105 = new QTableWidgetItem();
-        tableClients_2->setItem(2, 5, __qtablewidgetitem105);
+        __qtablewidgetitem105->setCheckState(Qt::Checked);
+        tableClients_2->setItem(2, 4, __qtablewidgetitem105);
         QTableWidgetItem *__qtablewidgetitem106 = new QTableWidgetItem();
-        tableClients_2->setItem(2, 6, __qtablewidgetitem106);
+        tableClients_2->setItem(2, 5, __qtablewidgetitem106);
+        QTableWidgetItem *__qtablewidgetitem107 = new QTableWidgetItem();
+        tableClients_2->setItem(2, 6, __qtablewidgetitem107);
+        QTableWidgetItem *__qtablewidgetitem108 = new QTableWidgetItem();
+        tableClients_2->setItem(2, 7, __qtablewidgetitem108);
         tableClients_2->setObjectName("tableClients_2");
         tableClients_2->setStyleSheet(QString::fromUtf8("/*QHeaderView::section { background-color:#2d224c;color:white;font-weight:bold; } QTableWidget { background-color:white; }*/\n"
 "QTableWidget {\n"
@@ -2041,7 +1990,7 @@ public:
         lblFicheClient_4->setFrameShadow(QFrame::Shadow::Raised);
         lblid_4 = new QLabel(frameFicheClient_4);
         lblid_4->setObjectName("lblid_4");
-        lblid_4->setGeometry(QRect(60, 160, 91, 20));
+        lblid_4->setGeometry(QRect(60, 160, 121, 20));
         lblid_4->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
         lblnom_5 = new QLabel(frameFicheClient_4);
         lblnom_5->setObjectName("lblnom_5");
@@ -2049,16 +1998,8 @@ public:
         lblnom_5->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
         lblprenom_4 = new QLabel(frameFicheClient_4);
         lblprenom_4->setObjectName("lblprenom_4");
-        lblprenom_4->setGeometry(QRect(60, 450, 91, 20));
+        lblprenom_4->setGeometry(QRect(60, 470, 121, 20));
         lblprenom_4->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
-        lbltel_4 = new QLabel(frameFicheClient_4);
-        lbltel_4->setObjectName("lbltel_4");
-        lbltel_4->setGeometry(QRect(60, 270, 121, 20));
-        lbltel_4->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
-        lblbirth_4 = new QLabel(frameFicheClient_4);
-        lblbirth_4->setObjectName("lblbirth_4");
-        lblbirth_4->setGeometry(QRect(60, 370, 91, 21));
-        lblbirth_4->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
         layoutWidget_4 = new QWidget(frameFicheClient_4);
         layoutWidget_4->setObjectName("layoutWidget_4");
         layoutWidget_4->setGeometry(QRect(790, 560, 240, 42));
@@ -2075,37 +2016,69 @@ public:
 
         ajouterActionLayout_4->addWidget(btnAnnuler_4);
 
-        lineEditNom_5 = new QLineEdit(frameFicheClient_4);
-        lineEditNom_5->setObjectName("lineEditNom_5");
-        lineEditNom_5->setGeometry(QRect(230, 210, 251, 26));
-        lineEditNom_5->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
-        lineEditPhone_4 = new QLineEdit(frameFicheClient_4);
-        lineEditPhone_4->setObjectName("lineEditPhone_4");
-        lineEditPhone_4->setGeometry(QRect(230, 260, 251, 26));
-        lineEditPhone_4->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
-        lineEditDateNaissance_5 = new QLineEdit(frameFicheClient_4);
-        lineEditDateNaissance_5->setObjectName("lineEditDateNaissance_5");
-        lineEditDateNaissance_5->setGeometry(QRect(230, 370, 251, 26));
-        lineEditDateNaissance_5->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
-        lineEditID_4 = new QLineEdit(frameFicheClient_4);
-        lineEditID_4->setObjectName("lineEditID_4");
-        lineEditID_4->setGeometry(QRect(230, 160, 251, 26));
-        lineEditID_4->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
+        nomentre = new QLineEdit(frameFicheClient_4);
+        nomentre->setObjectName("nomentre");
+        nomentre->setGeometry(QRect(230, 210, 251, 26));
+        nomentre->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
+        id_fournisseur = new QLineEdit(frameFicheClient_4);
+        id_fournisseur->setObjectName("id_fournisseur");
+        id_fournisseur->setGeometry(QRect(230, 160, 251, 26));
+        id_fournisseur->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         comboCategorie = new QComboBox(frameFicheClient_4);
         comboCategorie->addItem(QString());
         comboCategorie->addItem(QString());
         comboCategorie->addItem(QString());
         comboCategorie->addItem(QString());
         comboCategorie->setObjectName("comboCategorie");
-        comboCategorie->setGeometry(QRect(220, 440, 251, 31));
-        lineEditPhone_5 = new QLineEdit(frameFicheClient_4);
-        lineEditPhone_5->setObjectName("lineEditPhone_5");
-        lineEditPhone_5->setGeometry(QRect(230, 320, 251, 26));
-        lineEditPhone_5->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
+        comboCategorie->setGeometry(QRect(230, 470, 251, 31));
+        ADRESSE = new QLineEdit(frameFicheClient_4);
+        ADRESSE->setObjectName("ADRESSE");
+        ADRESSE->setGeometry(QRect(230, 310, 251, 26));
+        ADRESSE->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         lbltel_5 = new QLabel(frameFicheClient_4);
         lbltel_5->setObjectName("lbltel_5");
-        lbltel_5->setGeometry(QRect(60, 320, 121, 20));
+        lbltel_5->setGeometry(QRect(60, 310, 121, 20));
         lbltel_5->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
+        lbltel_6 = new QLabel(frameFicheClient_4);
+        lbltel_6->setObjectName("lbltel_6");
+        lbltel_6->setGeometry(QRect(60, 260, 121, 20));
+        lbltel_6->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
+        PERSONNE_CNT = new QLineEdit(frameFicheClient_4);
+        PERSONNE_CNT->setObjectName("PERSONNE_CNT");
+        PERSONNE_CNT->setGeometry(QRect(230, 260, 251, 26));
+        PERSONNE_CNT->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
+        lblbirth_5 = new QLabel(frameFicheClient_4);
+        lblbirth_5->setObjectName("lblbirth_5");
+        lblbirth_5->setGeometry(QRect(60, 360, 121, 21));
+        lblbirth_5->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
+        telephone = new QLineEdit(frameFicheClient_4);
+        telephone->setObjectName("telephone");
+        telephone->setGeometry(QRect(230, 360, 251, 26));
+        telephone->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
+        MAIL = new QLineEdit(frameFicheClient_4);
+        MAIL->setObjectName("MAIL");
+        MAIL->setGeometry(QRect(230, 410, 251, 26));
+        MAIL->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
+        lblbirth_6 = new QLabel(frameFicheClient_4);
+        lblbirth_6->setObjectName("lblbirth_6");
+        lblbirth_6->setGeometry(QRect(60, 410, 121, 21));
+        lblbirth_6->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
+        DETAILS = new QLineEdit(frameFicheClient_4);
+        DETAILS->setObjectName("DETAILS");
+        DETAILS->setGeometry(QRect(680, 170, 251, 26));
+        DETAILS->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
+        lblbirth_9 = new QLabel(frameFicheClient_4);
+        lblbirth_9->setObjectName("lblbirth_9");
+        lblbirth_9->setGeometry(QRect(530, 170, 121, 21));
+        lblbirth_9->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
+        lblbirth_10 = new QLabel(frameFicheClient_4);
+        lblbirth_10->setObjectName("lblbirth_10");
+        lblbirth_10->setGeometry(QRect(530, 230, 121, 21));
+        lblbirth_10->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
+        NOTEDEFIABILITE = new QLineEdit(frameFicheClient_4);
+        NOTEDEFIABILITE->setObjectName("NOTEDEFIABILITE");
+        NOTEDEFIABILITE->setGeometry(QRect(680, 230, 251, 26));
+        NOTEDEFIABILITE->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         btnAjouterClient_7 = new QPushButton(page_13);
         btnAjouterClient_7->setObjectName("btnAjouterClient_7");
         btnAjouterClient_7->setGeometry(QRect(650, 10, 331, 41));
@@ -2208,11 +2181,6 @@ public:
 
         searchLayout_5->addWidget(searchLineEdit_5);
 
-        btnRechercher_5 = new QPushButton(frame_12);
-        btnRechercher_5->setObjectName("btnRechercher_5");
-
-        searchLayout_5->addWidget(btnRechercher_5);
-
         comboProfession_5 = new QComboBox(frame_12);
         comboProfession_5->addItem(QString());
         comboProfession_5->addItem(QString());
@@ -2228,12 +2196,6 @@ public:
 
         searchLayout_5->addWidget(comboProfession_5);
 
-        btnFilter_5 = new QPushButton(frame_12);
-        btnFilter_5->setObjectName("btnFilter_5");
-        btnFilter_5->setStyleSheet(QString::fromUtf8("background-color:#a55eea;color:white;font-weight:bold;border-radius:10px;padding:8px 16px;font-size:14px;"));
-
-        searchLayout_5->addWidget(btnFilter_5);
-
         btnExporter_5 = new QPushButton(frame_12);
         btnExporter_5->setObjectName("btnExporter_5");
         btnExporter_5->setStyleSheet(QString::fromUtf8("background-color:#a55eea;color:white;font-weight:bold;border-radius:10px;padding:8px 16px;font-size:14px;"));
@@ -2248,52 +2210,52 @@ public:
         tablePersonnel_3 = new QTableWidget(frame_12);
         if (tablePersonnel_3->columnCount() < 9)
             tablePersonnel_3->setColumnCount(9);
-        QTableWidgetItem *__qtablewidgetitem107 = new QTableWidgetItem();
-        tablePersonnel_3->setHorizontalHeaderItem(0, __qtablewidgetitem107);
-        QTableWidgetItem *__qtablewidgetitem108 = new QTableWidgetItem();
-        tablePersonnel_3->setHorizontalHeaderItem(1, __qtablewidgetitem108);
         QTableWidgetItem *__qtablewidgetitem109 = new QTableWidgetItem();
-        tablePersonnel_3->setHorizontalHeaderItem(2, __qtablewidgetitem109);
+        tablePersonnel_3->setHorizontalHeaderItem(0, __qtablewidgetitem109);
         QTableWidgetItem *__qtablewidgetitem110 = new QTableWidgetItem();
-        tablePersonnel_3->setHorizontalHeaderItem(3, __qtablewidgetitem110);
+        tablePersonnel_3->setHorizontalHeaderItem(1, __qtablewidgetitem110);
         QTableWidgetItem *__qtablewidgetitem111 = new QTableWidgetItem();
-        tablePersonnel_3->setHorizontalHeaderItem(4, __qtablewidgetitem111);
+        tablePersonnel_3->setHorizontalHeaderItem(2, __qtablewidgetitem111);
         QTableWidgetItem *__qtablewidgetitem112 = new QTableWidgetItem();
-        tablePersonnel_3->setHorizontalHeaderItem(5, __qtablewidgetitem112);
+        tablePersonnel_3->setHorizontalHeaderItem(3, __qtablewidgetitem112);
         QTableWidgetItem *__qtablewidgetitem113 = new QTableWidgetItem();
-        tablePersonnel_3->setHorizontalHeaderItem(6, __qtablewidgetitem113);
+        tablePersonnel_3->setHorizontalHeaderItem(4, __qtablewidgetitem113);
         QTableWidgetItem *__qtablewidgetitem114 = new QTableWidgetItem();
-        tablePersonnel_3->setHorizontalHeaderItem(7, __qtablewidgetitem114);
+        tablePersonnel_3->setHorizontalHeaderItem(5, __qtablewidgetitem114);
         QTableWidgetItem *__qtablewidgetitem115 = new QTableWidgetItem();
-        tablePersonnel_3->setHorizontalHeaderItem(8, __qtablewidgetitem115);
+        tablePersonnel_3->setHorizontalHeaderItem(6, __qtablewidgetitem115);
+        QTableWidgetItem *__qtablewidgetitem116 = new QTableWidgetItem();
+        tablePersonnel_3->setHorizontalHeaderItem(7, __qtablewidgetitem116);
+        QTableWidgetItem *__qtablewidgetitem117 = new QTableWidgetItem();
+        tablePersonnel_3->setHorizontalHeaderItem(8, __qtablewidgetitem117);
         if (tablePersonnel_3->rowCount() < 8)
             tablePersonnel_3->setRowCount(8);
-        QTableWidgetItem *__qtablewidgetitem116 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(0, 0, __qtablewidgetitem116);
-        QTableWidgetItem *__qtablewidgetitem117 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(0, 1, __qtablewidgetitem117);
         QTableWidgetItem *__qtablewidgetitem118 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(0, 2, __qtablewidgetitem118);
+        tablePersonnel_3->setItem(0, 0, __qtablewidgetitem118);
         QTableWidgetItem *__qtablewidgetitem119 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(0, 3, __qtablewidgetitem119);
+        tablePersonnel_3->setItem(0, 1, __qtablewidgetitem119);
         QTableWidgetItem *__qtablewidgetitem120 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(0, 8, __qtablewidgetitem120);
+        tablePersonnel_3->setItem(0, 2, __qtablewidgetitem120);
         QTableWidgetItem *__qtablewidgetitem121 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(1, 0, __qtablewidgetitem121);
+        tablePersonnel_3->setItem(0, 3, __qtablewidgetitem121);
         QTableWidgetItem *__qtablewidgetitem122 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(1, 1, __qtablewidgetitem122);
+        tablePersonnel_3->setItem(0, 8, __qtablewidgetitem122);
         QTableWidgetItem *__qtablewidgetitem123 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(1, 2, __qtablewidgetitem123);
+        tablePersonnel_3->setItem(1, 0, __qtablewidgetitem123);
         QTableWidgetItem *__qtablewidgetitem124 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(1, 3, __qtablewidgetitem124);
+        tablePersonnel_3->setItem(1, 1, __qtablewidgetitem124);
         QTableWidgetItem *__qtablewidgetitem125 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(2, 0, __qtablewidgetitem125);
+        tablePersonnel_3->setItem(1, 2, __qtablewidgetitem125);
         QTableWidgetItem *__qtablewidgetitem126 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(2, 1, __qtablewidgetitem126);
+        tablePersonnel_3->setItem(1, 3, __qtablewidgetitem126);
         QTableWidgetItem *__qtablewidgetitem127 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(2, 2, __qtablewidgetitem127);
+        tablePersonnel_3->setItem(2, 0, __qtablewidgetitem127);
         QTableWidgetItem *__qtablewidgetitem128 = new QTableWidgetItem();
-        tablePersonnel_3->setItem(2, 3, __qtablewidgetitem128);
+        tablePersonnel_3->setItem(2, 1, __qtablewidgetitem128);
+        QTableWidgetItem *__qtablewidgetitem129 = new QTableWidgetItem();
+        tablePersonnel_3->setItem(2, 2, __qtablewidgetitem129);
+        QTableWidgetItem *__qtablewidgetitem130 = new QTableWidgetItem();
+        tablePersonnel_3->setItem(2, 3, __qtablewidgetitem130);
         tablePersonnel_3->setObjectName("tablePersonnel_3");
         tablePersonnel_3->setStyleSheet(QString::fromUtf8("/* --- Style du conteneur principal de la table --- */\n"
 "QTableWidget {\n"
@@ -2328,6 +2290,11 @@ public:
 
 
         verticalLayout_5->addLayout(headerLayout_10);
+
+        label_33 = new QLabel(frame_12);
+        label_33->setObjectName("label_33");
+
+        verticalLayout_5->addWidget(label_33);
 
         actionButtonsLayout_5 = new QHBoxLayout();
         actionButtonsLayout_5->setObjectName("actionButtonsLayout_5");
@@ -2369,33 +2336,6 @@ public:
 "    background-color: #5a4a82;\n"
 "    border: 2px solid #7158a0;\n"
 "}"));
-        label_32 = new QLabel(page_10);
-        label_32->setObjectName("label_32");
-        label_32->setGeometry(QRect(1190, 50, 211, 31));
-        label_32->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);\n"
-"background-color: rgb(0, 0, 127);\n"
-"border-color: rgb(0, 0, 255);"));
-        label_32->setAlignment(Qt::AlignmentFlag::AlignCenter);
-        frame_18 = new QFrame(page_10);
-        frame_18->setObjectName("frame_18");
-        frame_18->setGeometry(QRect(1190, 80, 211, 711));
-        frame_18->setStyleSheet(QString::fromUtf8("background-color: rgb(186, 186, 186);"));
-        frame_18->setFrameShape(QFrame::Shape::StyledPanel);
-        frame_18->setFrameShadow(QFrame::Shadow::Raised);
-        label_33 = new QLabel(frame_18);
-        label_33->setObjectName("label_33");
-        label_33->setGeometry(QRect(10, -20, 191, 351));
-        label_33->setPixmap(QPixmap(QString::fromUtf8(":/new/prefix1/784a706a-f6af-4062-9180-299d6847a0c1.png")));
-        label_33->setScaledContents(true);
-        label_33->setWordWrap(false);
-        label_33->setOpenExternalLinks(true);
-        label_34 = new QLabel(frame_18);
-        label_34->setObjectName("label_34");
-        label_34->setGeometry(QRect(10, 340, 191, 351));
-        label_34->setPixmap(QPixmap(QString::fromUtf8(":/new/prefix1/456.png")));
-        label_34->setScaledContents(true);
-        label_34->setWordWrap(true);
-        label_34->setOpenExternalLinks(true);
         stackedWidget_6->addWidget(page_10);
         page_14 = new QWidget();
         page_14->setObjectName("page_14");
@@ -2436,77 +2376,6 @@ public:
 "QPushButton:hover {\n"
 "    background-color: #5a4a82;\n"
 "    border: 2px solid #7158a0;\n"
-"}"));
-        label_29 = new QLabel(page_16);
-        label_29->setObjectName("label_29");
-        label_29->setGeometry(QRect(1010, 0, 211, 31));
-        label_29->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);\n"
-"background-color: rgb(255, 0, 0);\n"
-"border-color: rgb(0, 0, 255);\n"
-"font-size :20px;\n"
-"border-top-right-radius: 20px;\n"
-"border-top-left-radius: 20px;"));
-        label_29->setAlignment(Qt::AlignmentFlag::AlignCenter);
-        frame_17 = new QFrame(page_16);
-        frame_17->setObjectName("frame_17");
-        frame_17->setGeometry(QRect(1010, 30, 211, 631));
-        frame_17->setStyleSheet(QString::fromUtf8("background-color: rgb(186, 186, 186);\n"
-"border-bottom-right-radius: 25px;\n"
-"border-bottom-left-radius: 25px;"));
-        frame_17->setFrameShape(QFrame::Shape::StyledPanel);
-        frame_17->setFrameShadow(QFrame::Shadow::Raised);
-        label_18 = new QLabel(frame_17);
-        label_18->setObjectName("label_18");
-        label_18->setGeometry(QRect(10, 100, 191, 201));
-        label_18->setAutoFillBackground(false);
-        label_18->setPixmap(QPixmap(QString::fromUtf8(":/new/prefix1/fd6699_5ad46a373a2e4385bddfb0c531358041~mv2.png")));
-        label_18->setScaledContents(true);
-        tableWidget = new QTableWidget(frame_17);
-        if (tableWidget->columnCount() < 1)
-            tableWidget->setColumnCount(1);
-        QTableWidgetItem *__qtablewidgetitem129 = new QTableWidgetItem();
-        tableWidget->setHorizontalHeaderItem(0, __qtablewidgetitem129);
-        if (tableWidget->rowCount() < 5)
-            tableWidget->setRowCount(5);
-        QTableWidgetItem *__qtablewidgetitem130 = new QTableWidgetItem();
-        tableWidget->setItem(0, 0, __qtablewidgetitem130);
-        QTableWidgetItem *__qtablewidgetitem131 = new QTableWidgetItem();
-        tableWidget->setItem(1, 0, __qtablewidgetitem131);
-        QTableWidgetItem *__qtablewidgetitem132 = new QTableWidgetItem();
-        tableWidget->setItem(2, 0, __qtablewidgetitem132);
-        QTableWidgetItem *__qtablewidgetitem133 = new QTableWidgetItem();
-        tableWidget->setItem(3, 0, __qtablewidgetitem133);
-        QTableWidgetItem *__qtablewidgetitem134 = new QTableWidgetItem();
-        tableWidget->setItem(4, 0, __qtablewidgetitem134);
-        tableWidget->setObjectName("tableWidget");
-        tableWidget->setGeometry(QRect(40, 340, 131, 181));
-        tableWidget->setStyleSheet(QString::fromUtf8("/* --- Style du conteneur principal de la table --- */\n"
-"QTableWidget {\n"
-"    background-color: white;\n"
-"    color: rgb(0, 0, 0);\n"
-"    border-radius: 10px;\n"
-"    gridline-color: #dfe6e9;\n"
-"    border: 1px solid #dfe6e9;\n"
-"}\n"
-"\n"
-"/* --- Style de l'en-t\303\252te --- */\n"
-"QHeaderView::section {\n"
-"    background-color: #2d224c;\n"
-"    color: white;\n"
-"    font-weight: bold;\n"
-"    padding: 8px;\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"/* --- Style pour chaque cellule (SANS PADDING) --- */\n"
-"QTableWidget::item {\n"
-"    border-bottom: 1px solid #dfe6e9;\n"
-"}\n"
-"\n"
-"/* --- Style pour les cellules s\303\251lectionn\303\251es --- */\n"
-"QTableWidget::item:selected {\n"
-"    background-color: #a29bfe;\n"
-"    color: white;\n"
 "}"));
         frameFicheClient_5 = new QFrame(page_16);
         frameFicheClient_5->setObjectName("frameFicheClient_5");
@@ -2588,56 +2457,56 @@ public:
 
         lineEditNom_6 = new QLineEdit(frameFicheClient_5);
         lineEditNom_6->setObjectName("lineEditNom_6");
-        lineEditNom_6->setGeometry(QRect(220, 130, 251, 26));
+        lineEditNom_6->setGeometry(QRect(220, 130, 271, 26));
         lineEditNom_6->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         lineEditDateNaissance_6 = new QLineEdit(frameFicheClient_5);
         lineEditDateNaissance_6->setObjectName("lineEditDateNaissance_6");
-        lineEditDateNaissance_6->setGeometry(QRect(220, 250, 251, 26));
+        lineEditDateNaissance_6->setGeometry(QRect(220, 250, 271, 26));
         lineEditDateNaissance_6->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         lineEditID_5 = new QLineEdit(frameFicheClient_5);
         lineEditID_5->setObjectName("lineEditID_5");
-        lineEditID_5->setGeometry(QRect(220, 90, 251, 26));
+        lineEditID_5->setGeometry(QRect(220, 90, 271, 26));
         lineEditID_5->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         lineEditPrenom_4 = new QLineEdit(frameFicheClient_5);
         lineEditPrenom_4->setObjectName("lineEditPrenom_4");
-        lineEditPrenom_4->setGeometry(QRect(220, 170, 251, 26));
+        lineEditPrenom_4->setGeometry(QRect(220, 170, 271, 26));
         lineEditPrenom_4->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         label_31 = new QLabel(frameFicheClient_5);
         label_31->setObjectName("label_31");
-        label_31->setGeometry(QRect(100, 330, 91, 20));
+        label_31->setGeometry(QRect(100, 360, 91, 20));
         label_31->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
         label_35 = new QLabel(frameFicheClient_5);
         label_35->setObjectName("label_35");
-        label_35->setGeometry(QRect(100, 370, 91, 20));
+        label_35->setGeometry(QRect(100, 325, 91, 20));
         label_35->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
         lineEditDateNaissance_7 = new QLineEdit(frameFicheClient_5);
         lineEditDateNaissance_7->setObjectName("lineEditDateNaissance_7");
-        lineEditDateNaissance_7->setGeometry(QRect(220, 290, 251, 26));
+        lineEditDateNaissance_7->setGeometry(QRect(220, 290, 271, 26));
         lineEditDateNaissance_7->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         spinBox = new QSpinBox(frameFicheClient_5);
         spinBox->setObjectName("spinBox");
-        spinBox->setGeometry(QRect(220, 370, 141, 25));
+        spinBox->setGeometry(QRect(220, 325, 141, 25));
         spinBox->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         spinBox->setStepType(QAbstractSpinBox::StepType::AdaptiveDecimalStepType);
         spinBox_2 = new QSpinBox(frameFicheClient_5);
         spinBox_2->setObjectName("spinBox_2");
-        spinBox_2->setGeometry(QRect(220, 330, 141, 25));
+        spinBox_2->setGeometry(QRect(220, 360, 141, 25));
         spinBox_2->setStyleSheet(QString::fromUtf8("color :black;"));
         calendarWidget = new QCalendarWidget(frameFicheClient_5);
         calendarWidget->setObjectName("calendarWidget");
-        calendarWidget->setGeometry(QRect(550, 200, 256, 163));
+        calendarWidget->setGeometry(QRect(570, 200, 256, 163));
         calendarWidget->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         label_36 = new QLabel(frameFicheClient_5);
         label_36->setObjectName("label_36");
-        label_36->setGeometry(QRect(550, 160, 91, 20));
+        label_36->setGeometry(QRect(570, 160, 91, 20));
         label_36->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
         dateEdit = new QDateEdit(frameFicheClient_5);
         dateEdit->setObjectName("dateEdit");
-        dateEdit->setGeometry(QRect(660, 160, 110, 25));
+        dateEdit->setGeometry(QRect(680, 160, 110, 25));
         dateEdit->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         line = new QFrame(frameFicheClient_5);
         line->setObjectName("line");
-        line->setGeometry(QRect(500, 80, 20, 371));
+        line->setGeometry(QRect(520, 80, 20, 371));
         line->setStyleSheet(QString::fromUtf8("color: rgb(0, 0, 0);"));
         line->setFrameShape(QFrame::Shape::VLine);
         line->setFrameShadow(QFrame::Shadow::Sunken);
@@ -2671,13 +2540,16 @@ public:
         comboProfession_8->addItem(QString());
         comboProfession_8->addItem(QString());
         comboProfession_8->setObjectName("comboProfession_8");
-        comboProfession_8->setGeometry(QRect(670, 100, 121, 41));
+        comboProfession_8->setGeometry(QRect(690, 100, 121, 41));
         comboProfession_8->setStyleSheet(QString::fromUtf8("background-color:#41375f;color:white;font-weight:bold;border-radius:10px;padding:8px 16px;font-size:15px;"));
         comboProfession_8->setEditable(false);
         label_38 = new QLabel(frameFicheClient_5);
         label_38->setObjectName("label_38");
-        label_38->setGeometry(QRect(550, 110, 91, 20));
+        label_38->setGeometry(QRect(570, 110, 91, 20));
         label_38->setStyleSheet(QString::fromUtf8("background-color: rgb(48, 71, 120);"));
+        checkBoxAI = new QCheckBox(frameFicheClient_5);
+        checkBoxAI->setObjectName("checkBoxAI");
+        checkBoxAI->setGeometry(QRect(370, 360, 121, 31));
         stackedWidget_6->addWidget(page_15);
         stackedWidget->addWidget(produits);
         MainWindow->setCentralWidget(centralwidget);
@@ -2685,7 +2557,7 @@ public:
         frame_6->raise();
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1499, 25));
+        menubar->setGeometry(QRect(0, 0, 1499, 22));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName("statusbar");
@@ -2693,12 +2565,12 @@ public:
 
         retranslateUi(MainWindow);
 
-        stackedWidget->setCurrentIndex(2);
+        stackedWidget->setCurrentIndex(4);
         stackedWidget_3->setCurrentIndex(2);
         stackedWidget_2->setCurrentIndex(2);
         stackedWidget_4->setCurrentIndex(0);
-        stackedWidget_5->setCurrentIndex(2);
-        stackedWidget_6->setCurrentIndex(1);
+        stackedWidget_5->setCurrentIndex(0);
+        stackedWidget_6->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -2763,7 +2635,6 @@ public:
 
         btnListePersonnel_3->setText(QCoreApplication::translate("MainWindow", "Liste du Personnel", nullptr));
         btnAjouterPersonnel_3->setText(QCoreApplication::translate("MainWindow", "Ajouter Personnel", nullptr));
-        label_16->setText(QCoreApplication::translate("MainWindow", "Statistiques", nullptr));
         lblFicheClient->setText(QCoreApplication::translate("MainWindow", "Fiche Personnel", nullptr));
         lblid->setText(QCoreApplication::translate("MainWindow", "ID", nullptr));
         lblnom->setText(QCoreApplication::translate("MainWindow", "Nom", nullptr));
@@ -2984,9 +2855,10 @@ public:
         lblphoto->setText(QString());
         lblordo->setText(QCoreApplication::translate("MainWindow", "Ordonnance :", nullptr));
         lblpdp->setText(QCoreApplication::translate("MainWindow", "Photo de profil :", nullptr));
-        lblordo_2->setText(QCoreApplication::translate("MainWindow", "Achats recents :", nullptr));
+        lblordo_2->setText(QCoreApplication::translate("MainWindow", "Liste d'Achats  :", nullptr));
         lineEditPhoto->setPlaceholderText(QCoreApplication::translate("MainWindow", "Chemin de la photo", nullptr));
         lineEditOrdonnance->setPlaceholderText(QCoreApplication::translate("MainWindow", "Chemin de l'ordonnance", nullptr));
+        pushButton->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
         btnAjouterClient_5->setText(QCoreApplication::translate("MainWindow", "Ajouter client", nullptr));
         btnListeClients_5->setText(QCoreApplication::translate("MainWindow", "Liste des clients", nullptr));
         lblListeClients_4->setText(QCoreApplication::translate("MainWindow", "Liste des Fournisseur", nullptr));
@@ -2997,71 +2869,72 @@ public:
         toolButton_26->setText(QCoreApplication::translate("MainWindow", "Client", nullptr));
         searchLineEdit_4->setText(QCoreApplication::translate("MainWindow", "Recherche par Nom ou Email", nullptr));
         searchLineEdit_4->setPlaceholderText(QCoreApplication::translate("MainWindow", "Rechercher par ID ou Nom", nullptr));
-        btnRechercher_4->setStyleSheet(QCoreApplication::translate("MainWindow", "background-color:#a55eea;color:white;font-weight:bold;border-radius:10px;padding:8px 16px;font-size:14px;", nullptr));
-        btnRechercher_4->setText(QCoreApplication::translate("MainWindow", "Rechercher", nullptr));
         comboProfession_4->setItemText(0, QCoreApplication::translate("MainWindow", "Produit fournis", nullptr));
         comboProfession_4->setItemText(1, QCoreApplication::translate("MainWindow", "Statut", nullptr));
         comboProfession_4->setItemText(2, QCoreApplication::translate("MainWindow", "Nom de Fournisseur", nullptr));
 
-        btnFilter_4->setText(QCoreApplication::translate("MainWindow", "Filter", nullptr));
         btnExporter_4->setText(QCoreApplication::translate("MainWindow", "Exporter ", nullptr));
         QTableWidgetItem *___qtablewidgetitem51 = tableClients_2->horizontalHeaderItem(0);
         ___qtablewidgetitem51->setText(QCoreApplication::translate("MainWindow", "ID Fournisseur", nullptr));
         QTableWidgetItem *___qtablewidgetitem52 = tableClients_2->horizontalHeaderItem(1);
         ___qtablewidgetitem52->setText(QCoreApplication::translate("MainWindow", "Nom Entreprise", nullptr));
         QTableWidgetItem *___qtablewidgetitem53 = tableClients_2->horizontalHeaderItem(2);
-        ___qtablewidgetitem53->setText(QCoreApplication::translate("MainWindow", "Categorie", nullptr));
+        ___qtablewidgetitem53->setText(QCoreApplication::translate("MainWindow", "CAT\303\211GORIE", nullptr));
         QTableWidgetItem *___qtablewidgetitem54 = tableClients_2->horizontalHeaderItem(3);
-        ___qtablewidgetitem54->setText(QCoreApplication::translate("MainWindow", "Delais", nullptr));
+        ___qtablewidgetitem54->setText(QCoreApplication::translate("MainWindow", "PERSONNE_CNT", nullptr));
         QTableWidgetItem *___qtablewidgetitem55 = tableClients_2->horizontalHeaderItem(4);
-        ___qtablewidgetitem55->setText(QCoreApplication::translate("MainWindow", "Num Tel", nullptr));
+        ___qtablewidgetitem55->setText(QCoreApplication::translate("MainWindow", "DETAILS", nullptr));
         QTableWidgetItem *___qtablewidgetitem56 = tableClients_2->horizontalHeaderItem(5);
-        ___qtablewidgetitem56->setText(QCoreApplication::translate("MainWindow", "Addresse", nullptr));
+        ___qtablewidgetitem56->setText(QCoreApplication::translate("MainWindow", "NUM_TEL", nullptr));
         QTableWidgetItem *___qtablewidgetitem57 = tableClients_2->horizontalHeaderItem(6);
-        ___qtablewidgetitem57->setText(QCoreApplication::translate("MainWindow", "Modif", nullptr));
+        ___qtablewidgetitem57->setText(QCoreApplication::translate("MainWindow", "ADRESSE", nullptr));
+        QTableWidgetItem *___qtablewidgetitem58 = tableClients_2->horizontalHeaderItem(7);
+        ___qtablewidgetitem58->setText(QCoreApplication::translate("MainWindow", "MAIL", nullptr));
+        QTableWidgetItem *___qtablewidgetitem59 = tableClients_2->horizontalHeaderItem(8);
+        ___qtablewidgetitem59->setText(QCoreApplication::translate("MainWindow", "NOTE_DE_FIABILIT\303\211", nullptr));
 
         const bool __sortingEnabled3 = tableClients_2->isSortingEnabled();
         tableClients_2->setSortingEnabled(false);
-        QTableWidgetItem *___qtablewidgetitem58 = tableClients_2->item(0, 0);
-        ___qtablewidgetitem58->setText(QCoreApplication::translate("MainWindow", "125", nullptr));
-        QTableWidgetItem *___qtablewidgetitem59 = tableClients_2->item(0, 1);
-        ___qtablewidgetitem59->setText(QCoreApplication::translate("MainWindow", "romdhani", nullptr));
-        QTableWidgetItem *___qtablewidgetitem60 = tableClients_2->item(0, 2);
-        ___qtablewidgetitem60->setText(QCoreApplication::translate("MainWindow", "Lunettes", nullptr));
-        QTableWidgetItem *___qtablewidgetitem61 = tableClients_2->item(0, 3);
-        ___qtablewidgetitem61->setText(QCoreApplication::translate("MainWindow", "No", nullptr));
-        QTableWidgetItem *___qtablewidgetitem62 = tableClients_2->item(0, 4);
-        ___qtablewidgetitem62->setText(QCoreApplication::translate("MainWindow", "97877212", nullptr));
-        QTableWidgetItem *___qtablewidgetitem63 = tableClients_2->item(0, 5);
-        ___qtablewidgetitem63->setText(QCoreApplication::translate("MainWindow", "Tunis-Hammamet", nullptr));
-        QTableWidgetItem *___qtablewidgetitem64 = tableClients_2->item(1, 0);
-        ___qtablewidgetitem64->setText(QCoreApplication::translate("MainWindow", "5862", nullptr));
-        QTableWidgetItem *___qtablewidgetitem65 = tableClients_2->item(1, 1);
-        ___qtablewidgetitem65->setText(QCoreApplication::translate("MainWindow", "ayari", nullptr));
-        QTableWidgetItem *___qtablewidgetitem66 = tableClients_2->item(1, 2);
-        ___qtablewidgetitem66->setText(QCoreApplication::translate("MainWindow", "accessoires", nullptr));
-        QTableWidgetItem *___qtablewidgetitem67 = tableClients_2->item(1, 3);
-        ___qtablewidgetitem67->setText(QCoreApplication::translate("MainWindow", "un peux ", nullptr));
-        QTableWidgetItem *___qtablewidgetitem68 = tableClients_2->item(1, 4);
-        ___qtablewidgetitem68->setText(QCoreApplication::translate("MainWindow", "546544689", nullptr));
-        QTableWidgetItem *___qtablewidgetitem69 = tableClients_2->item(1, 5);
-        ___qtablewidgetitem69->setText(QCoreApplication::translate("MainWindow", "France-paris", nullptr));
-        QTableWidgetItem *___qtablewidgetitem70 = tableClients_2->item(1, 6);
-        ___qtablewidgetitem70->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
-        QTableWidgetItem *___qtablewidgetitem71 = tableClients_2->item(2, 0);
-        ___qtablewidgetitem71->setText(QCoreApplication::translate("MainWindow", "161532", nullptr));
-        QTableWidgetItem *___qtablewidgetitem72 = tableClients_2->item(2, 1);
-        ___qtablewidgetitem72->setText(QCoreApplication::translate("MainWindow", "malouch", nullptr));
-        QTableWidgetItem *___qtablewidgetitem73 = tableClients_2->item(2, 2);
-        ___qtablewidgetitem73->setText(QCoreApplication::translate("MainWindow", "lentilles", nullptr));
-        QTableWidgetItem *___qtablewidgetitem74 = tableClients_2->item(2, 3);
-        ___qtablewidgetitem74->setText(QCoreApplication::translate("MainWindow", "Tres retard", nullptr));
-        QTableWidgetItem *___qtablewidgetitem75 = tableClients_2->item(2, 4);
-        ___qtablewidgetitem75->setText(QCoreApplication::translate("MainWindow", "3545466512", nullptr));
-        QTableWidgetItem *___qtablewidgetitem76 = tableClients_2->item(2, 5);
-        ___qtablewidgetitem76->setText(QCoreApplication::translate("MainWindow", "Saudia-Al Riadh", nullptr));
-        QTableWidgetItem *___qtablewidgetitem77 = tableClients_2->item(2, 6);
-        ___qtablewidgetitem77->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
+        QTableWidgetItem *___qtablewidgetitem60 = tableClients_2->item(0, 0);
+        ___qtablewidgetitem60->setText(QCoreApplication::translate("MainWindow", "125", nullptr));
+        QTableWidgetItem *___qtablewidgetitem61 = tableClients_2->item(0, 1);
+        ___qtablewidgetitem61->setText(QCoreApplication::translate("MainWindow", "romdhani", nullptr));
+        QTableWidgetItem *___qtablewidgetitem62 = tableClients_2->item(0, 2);
+        ___qtablewidgetitem62->setText(QCoreApplication::translate("MainWindow", "Lunettes", nullptr));
+        QTableWidgetItem *___qtablewidgetitem63 = tableClients_2->item(0, 4);
+        ___qtablewidgetitem63->setText(QCoreApplication::translate("MainWindow", "No", nullptr));
+        QTableWidgetItem *___qtablewidgetitem64 = tableClients_2->item(0, 5);
+        ___qtablewidgetitem64->setText(QCoreApplication::translate("MainWindow", "97877212", nullptr));
+        QTableWidgetItem *___qtablewidgetitem65 = tableClients_2->item(0, 6);
+        ___qtablewidgetitem65->setText(QCoreApplication::translate("MainWindow", "Tunis-Hammamet", nullptr));
+        QTableWidgetItem *___qtablewidgetitem66 = tableClients_2->item(1, 0);
+        ___qtablewidgetitem66->setText(QCoreApplication::translate("MainWindow", "5862", nullptr));
+        QTableWidgetItem *___qtablewidgetitem67 = tableClients_2->item(1, 1);
+        ___qtablewidgetitem67->setText(QCoreApplication::translate("MainWindow", "ayari", nullptr));
+        QTableWidgetItem *___qtablewidgetitem68 = tableClients_2->item(1, 2);
+        ___qtablewidgetitem68->setText(QCoreApplication::translate("MainWindow", "accessoires", nullptr));
+        QTableWidgetItem *___qtablewidgetitem69 = tableClients_2->item(1, 4);
+        ___qtablewidgetitem69->setText(QCoreApplication::translate("MainWindow", "un peux ", nullptr));
+        QTableWidgetItem *___qtablewidgetitem70 = tableClients_2->item(1, 5);
+        ___qtablewidgetitem70->setText(QCoreApplication::translate("MainWindow", "546544689", nullptr));
+        QTableWidgetItem *___qtablewidgetitem71 = tableClients_2->item(1, 6);
+        ___qtablewidgetitem71->setText(QCoreApplication::translate("MainWindow", "France-paris", nullptr));
+        QTableWidgetItem *___qtablewidgetitem72 = tableClients_2->item(1, 7);
+        ___qtablewidgetitem72->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
+        QTableWidgetItem *___qtablewidgetitem73 = tableClients_2->item(2, 0);
+        ___qtablewidgetitem73->setText(QCoreApplication::translate("MainWindow", "161532", nullptr));
+        QTableWidgetItem *___qtablewidgetitem74 = tableClients_2->item(2, 1);
+        ___qtablewidgetitem74->setText(QCoreApplication::translate("MainWindow", "malouch", nullptr));
+        QTableWidgetItem *___qtablewidgetitem75 = tableClients_2->item(2, 2);
+        ___qtablewidgetitem75->setText(QCoreApplication::translate("MainWindow", "lentilles", nullptr));
+        QTableWidgetItem *___qtablewidgetitem76 = tableClients_2->item(2, 4);
+        ___qtablewidgetitem76->setText(QCoreApplication::translate("MainWindow", "Tres retard", nullptr));
+        QTableWidgetItem *___qtablewidgetitem77 = tableClients_2->item(2, 5);
+        ___qtablewidgetitem77->setText(QCoreApplication::translate("MainWindow", "3545466512", nullptr));
+        QTableWidgetItem *___qtablewidgetitem78 = tableClients_2->item(2, 6);
+        ___qtablewidgetitem78->setText(QCoreApplication::translate("MainWindow", "Saudia-Al Riadh", nullptr));
+        QTableWidgetItem *___qtablewidgetitem79 = tableClients_2->item(2, 7);
+        ___qtablewidgetitem79->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         tableClients_2->setSortingEnabled(__sortingEnabled3);
 
         btnListeClients_6->setText(QCoreApplication::translate("MainWindow", "Liste des Fournisseurs", nullptr));
@@ -3071,29 +2944,38 @@ public:
         lblid_4->setText(QCoreApplication::translate("MainWindow", "ID Fournisseur", nullptr));
         lblnom_5->setText(QCoreApplication::translate("MainWindow", "Nom De L'entreprise", nullptr));
         lblprenom_4->setText(QCoreApplication::translate("MainWindow", "Categorie", nullptr));
-        lbltel_4->setText(QCoreApplication::translate("MainWindow", "Personne de contact", nullptr));
-        lblbirth_4->setText(QCoreApplication::translate("MainWindow", "Adresse", nullptr));
         btnConfirmer_4->setStyleSheet(QCoreApplication::translate("MainWindow", "background-color:#2980b9;color:white;font-weight:bold;border-radius:15px;padding:8px 24px;font-size:15px;", nullptr));
         btnConfirmer_4->setText(QCoreApplication::translate("MainWindow", "Confirmer", nullptr));
         btnAnnuler_4->setStyleSheet(QCoreApplication::translate("MainWindow", "background-color:#636e72;color:white;font-weight:bold;border-radius:15px;padding:8px 24px;font-size:15px;", nullptr));
         btnAnnuler_4->setText(QCoreApplication::translate("MainWindow", "Annuler", nullptr));
-        lineEditNom_5->setText(QString());
-        lineEditNom_5->setPlaceholderText(QCoreApplication::translate("MainWindow", "Nom de L'Entreprise", nullptr));
-        lineEditPhone_4->setText(QString());
-        lineEditPhone_4->setPlaceholderText(QCoreApplication::translate("MainWindow", "Telephone", nullptr));
-        lineEditDateNaissance_5->setText(QString());
-        lineEditDateNaissance_5->setPlaceholderText(QCoreApplication::translate("MainWindow", "Adresse", nullptr));
-        lineEditID_4->setText(QString());
-        lineEditID_4->setPlaceholderText(QCoreApplication::translate("MainWindow", "ID Fournisseur", nullptr));
+        nomentre->setText(QString());
+        nomentre->setPlaceholderText(QCoreApplication::translate("MainWindow", "Nom de L'Entreprise", nullptr));
+        id_fournisseur->setText(QString());
+        id_fournisseur->setPlaceholderText(QCoreApplication::translate("MainWindow", "ID Fournisseur", nullptr));
         comboCategorie->setItemText(0, QCoreApplication::translate("MainWindow", "Lunettes", nullptr));
         comboCategorie->setItemText(1, QCoreApplication::translate("MainWindow", "Lentilles", nullptr));
         comboCategorie->setItemText(2, QCoreApplication::translate("MainWindow", "Services", nullptr));
         comboCategorie->setItemText(3, QCoreApplication::translate("MainWindow", "Accessoires", nullptr));
 
         comboCategorie->setStyleSheet(QCoreApplication::translate("MainWindow", "background-color:#41375f;color:white;font-weight:bold;border-radius:10px;padding:8px 16px;font-size:15px;", nullptr));
-        lineEditPhone_5->setText(QString());
-        lineEditPhone_5->setPlaceholderText(QCoreApplication::translate("MainWindow", "Email", nullptr));
-        lbltel_5->setText(QCoreApplication::translate("MainWindow", "Email", nullptr));
+        ADRESSE->setText(QString());
+        ADRESSE->setPlaceholderText(QCoreApplication::translate("MainWindow", "ADRESSE", nullptr));
+        lbltel_5->setText(QCoreApplication::translate("MainWindow", "ADRESSE", nullptr));
+        lbltel_6->setText(QCoreApplication::translate("MainWindow", "PERSONNE_CNT", nullptr));
+        PERSONNE_CNT->setText(QString());
+        PERSONNE_CNT->setPlaceholderText(QCoreApplication::translate("MainWindow", "PERSONNE_CNT", nullptr));
+        lblbirth_5->setText(QCoreApplication::translate("MainWindow", "telephone", nullptr));
+        telephone->setText(QString());
+        telephone->setPlaceholderText(QCoreApplication::translate("MainWindow", "telephone", nullptr));
+        MAIL->setText(QString());
+        MAIL->setPlaceholderText(QCoreApplication::translate("MainWindow", "MAIL", nullptr));
+        lblbirth_6->setText(QCoreApplication::translate("MainWindow", "mail", nullptr));
+        DETAILS->setText(QString());
+        DETAILS->setPlaceholderText(QCoreApplication::translate("MainWindow", "DETAILS", nullptr));
+        lblbirth_9->setText(QCoreApplication::translate("MainWindow", "DETAILS", nullptr));
+        lblbirth_10->setText(QCoreApplication::translate("MainWindow", "NOTE_DE_FIABILIT\303\211", nullptr));
+        NOTEDEFIABILITE->setText(QString());
+        NOTEDEFIABILITE->setPlaceholderText(QCoreApplication::translate("MainWindow", "NOTE_DE_FIABILIT\303\211", nullptr));
         btnAjouterClient_7->setText(QCoreApplication::translate("MainWindow", "Ajouter fournisseur", nullptr));
         btnListeClients_7->setText(QCoreApplication::translate("MainWindow", "Liste des fournisseurs", nullptr));
         lblListeClients_5->setText(QCoreApplication::translate("MainWindow", "Liste du Liste du Produit", nullptr));
@@ -3103,8 +2985,6 @@ public:
         toolButton_30->setText(QCoreApplication::translate("MainWindow", "Locaux", nullptr));
         toolButton_31->setText(QCoreApplication::translate("MainWindow", "Client", nullptr));
         searchLineEdit_5->setPlaceholderText(QCoreApplication::translate("MainWindow", "Rechercher par ID ou Nom de Produit", nullptr));
-        btnRechercher_5->setStyleSheet(QCoreApplication::translate("MainWindow", "background-color:#a55eea;color:white;font-weight:bold;border-radius:10px;padding:8px 16px;font-size:14px;", nullptr));
-        btnRechercher_5->setText(QCoreApplication::translate("MainWindow", "Rechercher", nullptr));
         comboProfession_5->setItemText(0, QCoreApplication::translate("MainWindow", "Trie", nullptr));
         comboProfession_5->setItemText(1, QCoreApplication::translate("MainWindow", "Prix Bas", nullptr));
         comboProfession_5->setItemText(2, QCoreApplication::translate("MainWindow", "Prix Haut", nullptr));
@@ -3114,57 +2994,35 @@ public:
         comboProfession_5->setItemText(6, QCoreApplication::translate("MainWindow", "Femme", nullptr));
 
         comboProfession_5->setCurrentText(QCoreApplication::translate("MainWindow", "Trie", nullptr));
-        btnFilter_5->setText(QCoreApplication::translate("MainWindow", "Filter", nullptr));
         btnExporter_5->setText(QCoreApplication::translate("MainWindow", "Exporter ", nullptr));
-        QTableWidgetItem *___qtablewidgetitem78 = tablePersonnel_3->horizontalHeaderItem(0);
-        ___qtablewidgetitem78->setText(QCoreApplication::translate("MainWindow", "ID Produit", nullptr));
-        QTableWidgetItem *___qtablewidgetitem79 = tablePersonnel_3->horizontalHeaderItem(1);
-        ___qtablewidgetitem79->setText(QCoreApplication::translate("MainWindow", "Marque", nullptr));
-        QTableWidgetItem *___qtablewidgetitem80 = tablePersonnel_3->horizontalHeaderItem(2);
-        ___qtablewidgetitem80->setText(QCoreApplication::translate("MainWindow", "Mod\303\251le", nullptr));
-        QTableWidgetItem *___qtablewidgetitem81 = tablePersonnel_3->horizontalHeaderItem(3);
-        ___qtablewidgetitem81->setText(QCoreApplication::translate("MainWindow", "Type", nullptr));
-        QTableWidgetItem *___qtablewidgetitem82 = tablePersonnel_3->horizontalHeaderItem(4);
-        ___qtablewidgetitem82->setText(QCoreApplication::translate("MainWindow", "Couleur", nullptr));
-        QTableWidgetItem *___qtablewidgetitem83 = tablePersonnel_3->horizontalHeaderItem(5);
-        ___qtablewidgetitem83->setText(QCoreApplication::translate("MainWindow", "Prix", nullptr));
-        QTableWidgetItem *___qtablewidgetitem84 = tablePersonnel_3->horizontalHeaderItem(6);
-        ___qtablewidgetitem84->setText(QCoreApplication::translate("MainWindow", "Quantit\303\251", nullptr));
-        QTableWidgetItem *___qtablewidgetitem85 = tablePersonnel_3->horizontalHeaderItem(7);
-        ___qtablewidgetitem85->setText(QCoreApplication::translate("MainWindow", "Date d'ajout", nullptr));
-        QTableWidgetItem *___qtablewidgetitem86 = tablePersonnel_3->horizontalHeaderItem(8);
-        ___qtablewidgetitem86->setText(QCoreApplication::translate("MainWindow", "Actions", nullptr));
+        QTableWidgetItem *___qtablewidgetitem80 = tablePersonnel_3->horizontalHeaderItem(0);
+        ___qtablewidgetitem80->setText(QCoreApplication::translate("MainWindow", "ID Produit", nullptr));
+        QTableWidgetItem *___qtablewidgetitem81 = tablePersonnel_3->horizontalHeaderItem(1);
+        ___qtablewidgetitem81->setText(QCoreApplication::translate("MainWindow", "Marque", nullptr));
+        QTableWidgetItem *___qtablewidgetitem82 = tablePersonnel_3->horizontalHeaderItem(2);
+        ___qtablewidgetitem82->setText(QCoreApplication::translate("MainWindow", "Mod\303\251le", nullptr));
+        QTableWidgetItem *___qtablewidgetitem83 = tablePersonnel_3->horizontalHeaderItem(3);
+        ___qtablewidgetitem83->setText(QCoreApplication::translate("MainWindow", "Type", nullptr));
+        QTableWidgetItem *___qtablewidgetitem84 = tablePersonnel_3->horizontalHeaderItem(4);
+        ___qtablewidgetitem84->setText(QCoreApplication::translate("MainWindow", "Couleur", nullptr));
+        QTableWidgetItem *___qtablewidgetitem85 = tablePersonnel_3->horizontalHeaderItem(5);
+        ___qtablewidgetitem85->setText(QCoreApplication::translate("MainWindow", "Prix", nullptr));
+        QTableWidgetItem *___qtablewidgetitem86 = tablePersonnel_3->horizontalHeaderItem(6);
+        ___qtablewidgetitem86->setText(QCoreApplication::translate("MainWindow", "Quantit\303\251", nullptr));
+        QTableWidgetItem *___qtablewidgetitem87 = tablePersonnel_3->horizontalHeaderItem(7);
+        ___qtablewidgetitem87->setText(QCoreApplication::translate("MainWindow", "Date d'ajout", nullptr));
+        QTableWidgetItem *___qtablewidgetitem88 = tablePersonnel_3->horizontalHeaderItem(8);
+        ___qtablewidgetitem88->setText(QCoreApplication::translate("MainWindow", "Actions", nullptr));
 
         const bool __sortingEnabled4 = tablePersonnel_3->isSortingEnabled();
         tablePersonnel_3->setSortingEnabled(false);
         tablePersonnel_3->setSortingEnabled(__sortingEnabled4);
 
+        label_33->setText(QString());
         btnListePersonnel_5->setText(QCoreApplication::translate("MainWindow", "Liste du Produit", nullptr));
         btnAjouterPersonnel_5->setText(QCoreApplication::translate("MainWindow", "Ajouter Produit", nullptr));
-        label_32->setText(QCoreApplication::translate("MainWindow", "Statistiques", nullptr));
-        label_33->setText(QString());
-        label_34->setText(QString());
         btnAjouterClient_8->setText(QCoreApplication::translate("MainWindow", "Ajouter Produit", nullptr));
         btnListeClients_8->setText(QCoreApplication::translate("MainWindow", "Liste du Produit", nullptr));
-        label_29->setText(QCoreApplication::translate("MainWindow", "alerte", nullptr));
-        label_18->setText(QString());
-        QTableWidgetItem *___qtablewidgetitem87 = tableWidget->horizontalHeaderItem(0);
-        ___qtablewidgetitem87->setText(QCoreApplication::translate("MainWindow", "ID Produit", nullptr));
-
-        const bool __sortingEnabled5 = tableWidget->isSortingEnabled();
-        tableWidget->setSortingEnabled(false);
-        QTableWidgetItem *___qtablewidgetitem88 = tableWidget->item(0, 0);
-        ___qtablewidgetitem88->setText(QCoreApplication::translate("MainWindow", "2312", nullptr));
-        QTableWidgetItem *___qtablewidgetitem89 = tableWidget->item(1, 0);
-        ___qtablewidgetitem89->setText(QCoreApplication::translate("MainWindow", "6574", nullptr));
-        QTableWidgetItem *___qtablewidgetitem90 = tableWidget->item(2, 0);
-        ___qtablewidgetitem90->setText(QCoreApplication::translate("MainWindow", "7456", nullptr));
-        QTableWidgetItem *___qtablewidgetitem91 = tableWidget->item(3, 0);
-        ___qtablewidgetitem91->setText(QCoreApplication::translate("MainWindow", "0879", nullptr));
-        QTableWidgetItem *___qtablewidgetitem92 = tableWidget->item(4, 0);
-        ___qtablewidgetitem92->setText(QCoreApplication::translate("MainWindow", "2313", nullptr));
-        tableWidget->setSortingEnabled(__sortingEnabled5);
-
         lblFicheClient_5->setText(QCoreApplication::translate("MainWindow", "Fiche Produit", nullptr));
         label_5->setText(QCoreApplication::translate("MainWindow", "ID Produit", nullptr));
         label_6->setText(QCoreApplication::translate("MainWindow", "Marque", nullptr));
@@ -3206,6 +3064,7 @@ public:
         comboProfession_8->setItemText(3, QCoreApplication::translate("MainWindow", "Unisexe", nullptr));
 
         label_38->setText(QCoreApplication::translate("MainWindow", "Genre", nullptr));
+        checkBoxAI->setText(QCoreApplication::translate("MainWindow", "auto-discount (AI)", nullptr));
     } // retranslateUi
 
 };

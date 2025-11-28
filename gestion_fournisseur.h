@@ -17,7 +17,6 @@ public:
                         const QString &categorie, const QString &details,
                         float noteFiabilite);
 
-    // Getters
     int getId() const;
     QString getNomEntreprise() const;
     QString getPersonneContact() const;
@@ -28,7 +27,6 @@ public:
     QString getDetails() const;
     float getNoteFiabilite() const;
 
-    // Setters
     bool setId(int id);
     bool setNomEntreprise(const QString &nom);
     bool setPersonneContact(const QString &personne);
@@ -39,7 +37,6 @@ public:
     bool setDetails(const QString &details);
     bool setNoteFiabilite(float note);
 
-    // CRUD
     static bool ajouterFournisseur(int id, const QString &nomEntreprise,
                                    const QString &personneContact, const QString &adresse,
                                    int telephone, const QString &mail,
@@ -54,7 +51,6 @@ public:
                                     const QString &categorie, const QString &details,
                                     float noteFiabilite, QString &erreurMessage);
 
-    // Validation
     bool isValid() const;
     static bool isValidId(int id);
     static bool isValidNom(const QString &nom);
@@ -74,4 +70,4 @@ private:
     float m_noteFiabilite;
 };
 
-#endif // GESTION_FOURNISSEUR_H
+#endif

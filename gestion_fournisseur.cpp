@@ -32,7 +32,6 @@ Gestion_Fournisseur::Gestion_Fournisseur(int id, const QString &nomEntreprise,
     setNoteFiabilite(noteFiabilite);
 }
 
-// Getters
 int Gestion_Fournisseur::getId() const { return m_id; }
 QString Gestion_Fournisseur::getNomEntreprise() const { return m_nomEntreprise; }
 QString Gestion_Fournisseur::getPersonneContact() const { return m_personneContact; }
@@ -43,7 +42,6 @@ QString Gestion_Fournisseur::getCategorie() const { return m_categorie; }
 QString Gestion_Fournisseur::getDetails() const { return m_details; }
 float Gestion_Fournisseur::getNoteFiabilite() const { return m_noteFiabilite; }
 
-// Setters
 bool Gestion_Fournisseur::setId(int id) {
     if (!isValidId(id)) return false;
     m_id = id;
@@ -94,21 +92,18 @@ bool Gestion_Fournisseur::setNoteFiabilite(float note) {
     return true;
 }
 
-// CRUD Operations
 bool Gestion_Fournisseur::ajouterFournisseur(int id, const QString &nomEntreprise,
                                              const QString &personneContact, const QString &adresse,
                                              int telephone, const QString &mail,
                                              const QString &categorie, const QString &details,
                                              float noteFiabilite, QString &erreurMessage)
 {
-    // Validation
     if (!isValidId(id)) { erreurMessage = "ID invalide !"; return false; }
     if (!isValidNom(nomEntreprise)) { erreurMessage = "Nom entreprise invalide !"; return false; }
     if (!isValidTelephone(telephone)) { erreurMessage = "Téléphone invalide !"; return false; }
     if (!isValidMail(mail)) { erreurMessage = "Mail invalide !"; return false; }
     if (!isValidCategorie(categorie)) { erreurMessage = "Catégorie invalide !"; return false; }
 
-    // Connexion
     Connection c;
     if (!c.createconnect()) {
         erreurMessage = "Connexion échouée !";
@@ -117,7 +112,6 @@ bool Gestion_Fournisseur::ajouterFournisseur(int id, const QString &nomEntrepris
 
     QSqlDatabase db = QSqlDatabase::database();
 
-    // Vérifier ID existant
     QSqlQuery check(db);
     check.prepare("SELECT 1 FROM FOURNISSEUR WHERE ID_FOURNISSEUR = :id");
     check.bindValue(":id", id);
@@ -126,7 +120,6 @@ bool Gestion_Fournisseur::ajouterFournisseur(int id, const QString &nomEntrepris
         return false;
     }
 
-    // Insertion
     QSqlQuery query(db);
     query.prepare(
         "INSERT INTO FOURNISSEUR (ID_FOURNISSEUR, NOMENTURE, PERSONNE_CNT, ADRESSE, "
@@ -221,7 +214,6 @@ bool Gestion_Fournisseur::modifierFournisseur(int id, const QString &nomEntrepri
                                               const QString &categorie, const QString &details,
                                               float noteFiabilite, QString &erreurMessage)
 {
-    // Validation
     if (!isValidId(id)) { erreurMessage = "ID invalide !"; return false; }
     if (!isValidNom(nomEntreprise)) { erreurMessage = "Nom entreprise invalide !"; return false; }
     if (!isValidTelephone(telephone)) { erreurMessage = "Téléphone invalide !"; return false; }
@@ -266,25 +258,32 @@ bool Gestion_Fournisseur::modifierFournisseur(int id, const QString &nomEntrepri
     }
 }
 
-// Validation
-bool Gestion_Fournisseur::isValidId(int id) { return id > 0; }
+bool Gestion_Fournisseur::isValidId(int id) {
+    return id > 0 && id <= 999999999;
+}
 
 bool Gestion_Fournisseur::isValidNom(const QString &nom) {
-    return nom.trimmed().length() >= 2 && nom.trimmed().length() <= 20;
+    QString trimmed = nom.trimmed();
+    return trimmed.length() >= 2 && trimmed.length() <= 20 &&
+           QRegularExpression("^[A-Za-zÀ-ÿ0-9\\s\\-&.]+$").match(trimmed).hasMatch();
 }
 
 bool Gestion_Fournisseur::isValidTelephone(int telephone) {
-    return telephone >= 10000000 && telephone <= 9999999999;
+    QString telStr = QString::number(telephone);
+    return telStr.length() >= 8 && telStr.length() <= 10;
 }
 
 bool Gestion_Fournisseur::isValidMail(const QString &mail) {
+    if (mail.isEmpty()) return true;
     QRegularExpression regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-    return regex.match(mail).hasMatch() && mail.length() <= 20;
+    return regex.match(mail).hasMatch() && mail.length() <= 40;
 }
 
 bool Gestion_Fournisseur::isValidCategorie(const QString &categorie) {
     return categorie == "Lunettes" || categorie == "Lentilles" ||
-           categorie == "Services" || categorie == "Accessoires";
+           categorie == "Services" || categorie == "Accessoires" ||
+           categorie == "Électronique" || categorie == "Médical" ||
+           categorie == "Textile";
 }
 
 bool Gestion_Fournisseur::isValid() const {
