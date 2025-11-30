@@ -7,10 +7,16 @@
 #include "gestion_locaux.h"
 #include "gestion_fournisseur.h"
 #include "gestion_produit.h"
+#include "StatisticsWidget.h"
 #include <QTableWidgetItem>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <opencv2/opencv.hpp>
+#include <opencv2/objdetect.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -65,6 +71,12 @@ private slots:
     void chargerEtAfficherClient(int id);
     void onFiltresChanged();
 
+    void rafraichirStatistiquesClients();
+    void onPageChanged();
+    void on_btnUploadPhoto_clicked();
+    void on_btnUploadOrdonnance_clicked();
+
+
 private:
     Ui::MainWindow *ui;
 
@@ -87,8 +99,18 @@ private:
     bool ligneCorrespondFiltre(int row, const QString &filtre);
     void appliquerFiltre(const QString &filtre);
     void reinitialiserFiltres();
+    void decrementerQuantiteProduit(int idProduit);
+    StatisticsWidget *m_statsWidget;
+    QLineEdit *lineEditIDProduit;
+    QString photoPath;
+    QString ordonnancePath;
+    QString genererNomCourt(const QString &cheminOriginal, const QString &prefixe);
+    QString copierFichierVersDossierApp(const QString &sourcePath, const QString &dossier, const QString &prefixe);
+    void afficherPhotoPleinCadre(const QString &cheminPhoto);
+    bool validerVisageHumain(const QString &cheminPhoto, QString &erreurMessage);
+    void verifierInstallationOpenCV();
 
-
+    void appliquerFiltreAvecSQL(const QString &filtre, const QString &recherche);
 };
 
 #endif // MAINWINDOW_H

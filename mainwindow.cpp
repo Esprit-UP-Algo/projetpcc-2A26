@@ -6,6 +6,8 @@
 #include "gestion_fournisseur.h"
 #include "gestion_produit.h"
 #include "connection.h"
+#include "SMS_client.h"
+#include "StatisticsWidget.h"
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QTableWidgetItem>
@@ -13,7 +15,7 @@
 #include <QRegularExpression>
 
 
-#include <QPrinter>
+#include <QPrinter> // Export PDF
 #include <QTextDocument>
 #include <QFileDialog>
 #include <QTextTable>
@@ -27,6 +29,10 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    ,lineEditIDProduit(nullptr)
+    , photoPath("")
+    , ordonnancePath("")
+
 {
     ui->setupUi(this);
     connect(ui->searchLineEdit_3, &QLineEdit::textChanged,
@@ -36,7 +42,67 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->tableClients, &QTableWidget::doubleClicked, this, &MainWindow::on_tableClients_doubleClicked);
 
     rafraichirTableauClients();
-    // Dans le constructeur, après tes autres initialisations :
+    verifierInstallationOpenCV();
+
+    // STATISTIQUES
+    ui->label_2->setVisible(false);
+
+    // Créer le widget de statistiques à la même position
+    m_statsWidget = new StatisticsWidget(this);
+    //m_statsWidget->setGeometry(1140, 80, 351, 291);// Même position et taille que l'image
+    m_statsWidget->setGeometry(1140, 80, 351, 720); // Nouvelle hauteur
+
+    // Et assurez-vous de cacher le label_3 :
+    ui->label_3->setVisible(false);
+    connect(ui->stackedWidget_4, &QStackedWidget::currentChanged, this, &MainWindow::onPageChanged);
+    connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, &MainWindow::onPageChanged);
+    // Initialiser les statistiques
+    rafraichirStatistiquesClients();
+
+
+
+    // 1. BOUTON UPLOAD PHOTO
+    QPushButton *btnUploadPhoto = new QPushButton(ui->frameFicheClient_3);
+    btnUploadPhoto->setObjectName("btnUploadPhoto");
+    btnUploadPhoto->setGeometry(610, 240, 90, 30);
+    btnUploadPhoto->setText("Choisir photo");
+    btnUploadPhoto->setStyleSheet("QPushButton {"
+                                  "background-color: #41375f;"
+                                  "color: white;"
+                                  "border-radius: 10px;"
+                                  "padding: 5px;"
+                                  "font-weight: bold;"
+                                  "}"
+                                  "QPushButton:hover {"
+                                  "background-color: #5a4a82;"
+                                  "}");
+
+    // 2. BOUTON UPLOAD ORDONNANCE
+    QPushButton *btnUploadOrdonnance = new QPushButton(ui->frameFicheClient_3);
+    btnUploadOrdonnance->setObjectName("btnUploadOrdonnance");
+    btnUploadOrdonnance->setGeometry(920, 340, 90, 30);
+    btnUploadOrdonnance->setText("Choisir fichier");
+    btnUploadOrdonnance->setStyleSheet(btnUploadPhoto->styleSheet());
+
+    // 3. CONNEXIONS DES BOUTONS
+    connect(btnUploadPhoto, &QPushButton::clicked, this, &MainWindow::on_btnUploadPhoto_clicked);
+    connect(btnUploadOrdonnance, &QPushButton::clicked, this, &MainWindow::on_btnUploadOrdonnance_clicked);
+
+    //  CRÉATION DU LINEEDIT ID PRODUIT
+    lineEditIDProduit = new QLineEdit(ui->frameFicheClient_3);
+    lineEditIDProduit->setObjectName("lineEditIDProduit");
+    lineEditIDProduit->setGeometry(790, 390, 201, 31);  // Position où était le textEdit
+    lineEditIDProduit->setPlaceholderText("ID du produit acheté");
+    lineEditIDProduit->setValidator(new QIntValidator(1, 999999, this));
+    lineEditIDProduit->setStyleSheet("color: rgb(0, 0, 0); border: 1px solid gray; border-radius: 5px; padding: 5px;");
+
+    // DÉPLACER LE TEXTEEDIT PLUS BAS POUR FAIRE DE LA PLACE
+    ui->textEdit->setGeometry(790, 410, 201, 31);  // On le descend un peu
+
+
+
+
+
 
     // Initialiser le combo de filtrage
     ui->comboProfession_3->clear();
@@ -50,7 +116,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->comboProfession_3->addItem("Sexe: Femme");
 
     // Connexions
-    connect(ui->comboProfession_3, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onFiltresChanged);
+    //connect(ui->comboProfession_3, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onFiltresChanged);
+    connect(ui->searchLineEdit_3, &QLineEdit::textChanged, this, [this]() {
+        QString filtre = ui->comboProfession_3->currentText();
+        QString recherche = ui->searchLineEdit_3->text().trimmed();
+        appliquerFiltreAvecSQL(filtre, recherche);
+    });
+
+    connect(ui->comboProfession_3, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onFiltresChanged);
 
     connect(ui->tableClients, &QTableWidget::itemChanged, this, &MainWindow::onTableItemChanged);
     connect(ui->tablePersonnel, &QTableWidget::itemChanged, this, &MainWindow::onTablePersonnelItemChanged);
@@ -229,29 +303,76 @@ void MainWindow::on_btnConfirmer_3_clicked()
     QString sexeTexte = ui->comboSexe_2->currentText();
     if (sexeTexte.isEmpty()) { QMessageBox::warning(this, "Erreur", "Choisissez un sexe !"); return; }
 
-    QString photo = "";
-    QString ordonnance = "";
-
     if (!okId || !okTel || id <= 0) {
         QMessageBox::warning(this, "Erreur", "ID et téléphone doivent être numériques !");
         return;
     }
+    QString idProduitText = lineEditIDProduit->text().trimmed();  // ⭐⭐ ICI on utilise lineEditIDProduit
+    if (!idProduitText.isEmpty()) {
+        bool ok;
+        int idProduit = idProduitText.toInt(&ok);
 
+        if (ok && idProduit > 0) {
+            // Décrémenter la quantité du produit
+            decrementerQuantiteProduit(idProduit);
+
+            // Ajouter à l'historique des achats
+            QString achat = QString("Produit %1 - %2")
+                                .arg(idProduit)
+                                .arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm"));
+            ui->listachatrecents->addItem(achat);
+
+        } else {
+            QMessageBox::warning(this, "ID produit invalide",
+                                 "L'ID du produit doit être un nombre positif !");
+            return; // Arrêter la confirmation
+        }
+    }
+    // Utiliser directement les variables existantes
+    QString photo = "";
+    QString ordonnance = "";
+
+    // Gestion de la photo
+    if (!photoPath.isEmpty()) {
+        photo = copierFichierVersDossierApp(photoPath, "photos_clients", "pho");
+        if (photo.isEmpty()) {
+            QMessageBox::warning(this, "Erreur", "Échec de la copie de la photo !");
+            return;
+        }
+        if (photo.length() > 20) {
+            QMessageBox::warning(this, "Erreur", "Le nom de la photo est trop long pour la base de données.");
+            return;
+        }
+    }
+
+    // Gestion de l'ordonnance
+    if (!ordonnancePath.isEmpty()) {
+        ordonnance = copierFichierVersDossierApp(ordonnancePath, "ordonnances_clients", "ord");
+        if (ordonnance.isEmpty()) {
+            QMessageBox::warning(this, "Erreur", "Échec de la copie de l'ordonnance !");
+            return;
+        }
+        if (ordonnance.length() > 20) {
+            QMessageBox::warning(this, "Erreur", "Le nom de l'ordonnance est trop long pour la base de données.");
+            return;
+        }
+    }
+
+    // Maintenant les variables 'photo' et 'ordonnance' contiennent les noms des fichiers copiés
     QString erreur;
     bool succes;
 
-    // Vérifier si on est en mode modification ou ajout
     if (ui->lineEditID_3->isEnabled()) {
-        // MODE AJOUT - utiliser ta fonction existante
+        // MODE AJOUT
         succes = gestion_client::ajouterClient(
             id, nom, prenom, telephone, dateNaissance,
-            statut, sexeTexte, ordonnance, photo, erreur
+            statut, sexeTexte, ordonnance, photo, erreur  // ← Utiliser les variables originales
             );
     } else {
-        // MODE MODIFICATION - utiliser une fonction de mise à jour
+        // MODE MODIFICATION
         succes = modifierClientExistant(
             id, nom, prenom, telephone, dateNaissance,
-            statut, sexeTexte, ordonnance, photo, erreur
+            statut, sexeTexte, ordonnance, photo, erreur  // ← Utiliser les variables originales
             );
     }
 
@@ -259,11 +380,13 @@ void MainWindow::on_btnConfirmer_3_clicked()
         QMessageBox::information(this, "Succès", erreur);
         viderFormulaireClient();
         rafraichirTableauClients();
+        rafraichirStatistiquesClients();
         ui->stackedWidget_4->setCurrentIndex(0);
     } else {
         QMessageBox::critical(this, "Erreur", erreur);
     }
 }
+
 
 void MainWindow::on_btnAnnuler_3_clicked() {
     viderFormulaireClient();
@@ -458,12 +581,24 @@ void MainWindow::viderFormulaireClient()
     ui->checkNew_2->setChecked(false);
     ui->checkOld_2->setChecked(false);
     ui->checkVIP_2->setChecked(false);
+    if (lineEditIDProduit) {
+        lineEditIDProduit->clear();
+    }
+    ui->listachatrecents->clear();
+    photoPath = "";
+    ordonnancePath = "";
+
+    // Remettre l'image par défaut
+    ui->lblphoto->setPixmap(QPixmap(":/new/prefix1/uplode-removebg-preview.png"));
+    ui->lineEditPhoto->clear();
+    ui->lineEditOrdonnance->clear();
+
 
     // Réactiver l'ID pour le prochain ajout
     ui->lineEditID_3->setEnabled(true);
 
     // Remettre le texte original du bouton
-    ui->btnConfirmer_3->setText("Ajouter le client");
+    ui->btnConfirmer_3->setText("confirmer");
 
     ui->lineEditID_3->setStyleSheet("");
     ui->lineEditNom_4->setStyleSheet("");
@@ -596,16 +731,18 @@ void MainWindow::rafraichirTableauClients()
                 if (gestion_client::supprimerClient(clientId, err)) {
                     QMessageBox::information(this, "Succès", err);
                     rafraichirTableauClients();
+                     rafraichirStatistiquesClients();
                 } else {
                     QMessageBox::critical(this, "Erreur", err);
                 }
             }
         });
 
-        connect(btnSMS, &QPushButton::clicked, this, [this, tel]() {
-            QMessageBox::information(this, "SMS", "Envoyer à : " + QString::number(tel));
+        connect(btnSMS, &QPushButton::clicked, this, [this, tel, clientName = c.getPrenom() + " " + c.getNom()]() {
+            SMS_client *smsWindow = new SMS_client(this, QString::number(tel), clientName);
+            smsWindow->exec();
+            smsWindow->deleteLater();
         });
-
         ui->tableClients->setCellWidget(row, 7, actionsWidget);
         row++;
     }
@@ -1310,7 +1447,7 @@ void MainWindow::onTableProduitItemChanged(QTableWidgetItem *item)
         rafraichirTableauProduit();
     }
 }
-void MainWindow::on_searchLineEdit_3_textChanged(const QString &text)
+/*void MainWindow::on_searchLineEdit_3_textChanged(const QString &text)
 {
     QString filter = text.trimmed();
     QString filtreActif = ui->comboProfession_3->currentText();
@@ -1337,8 +1474,148 @@ void MainWindow::on_searchLineEdit_3_textChanged(const QString &text)
         ui->tableClients->setRowHidden(i, !show);
     }
 }
+*/
+void MainWindow::on_searchLineEdit_3_textChanged(const QString &text)
+{
+    QString filter = text.trimmed();
 
-void MainWindow::on_btnExporter_3_clicked()
+    // Bloquer les signaux pendant le rafraîchissement
+    ui->tableClients->blockSignals(true);
+    ui->tableClients->setRowCount(0);
+
+    Connection c;
+    if (!c.createconnect()) {
+        QMessageBox::critical(this, "Erreur", "Connexion échouée !");
+        ui->tableClients->blockSignals(false);
+        return;
+    }
+
+    QSqlQuery query;
+    QString sql;
+
+    if (filter.isEmpty()) {
+        // Si pas de recherche, charger tous les clients
+        sql = "SELECT ID_CLIENT, NOM, PRENOM, NUM_TEL, DATE_DE_NAISSANCE, "
+              "STATUT, SEXE FROM CLIENT ORDER BY ID_CLIENT";
+        query.prepare(sql);
+    } else {
+        // Recherche avec LIKE sur ID, Nom et Prénom
+        sql = "SELECT ID_CLIENT, NOM, PRENOM, NUM_TEL, DATE_DE_NAISSANCE, "
+              "STATUT, SEXE FROM CLIENT "
+              "WHERE CAST(ID_CLIENT AS VARCHAR(10)) LIKE :filter "
+              "OR UPPER(NOM) LIKE UPPER(:filter) "
+              "OR UPPER(PRENOM) LIKE UPPER(:filter) "
+              "ORDER BY ID_CLIENT";
+        query.prepare(sql);
+        query.bindValue(":filter", "%" + filter + "%");
+    }
+
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Erreur", "Échec de la recherche : " + query.lastError().text());
+        ui->tableClients->blockSignals(false);
+        return;
+    }
+
+    // Configuration du tableau
+    ui->tableClients->setColumnCount(8);
+    QStringList headers = {"ID", "Nom", "Prénom", "Âge", "Statut", "Téléphone", "Sexe", "Actions"};
+    ui->tableClients->setHorizontalHeaderLabels(headers);
+
+    ui->tableClients->setColumnWidth(0, 120);
+    ui->tableClients->setColumnWidth(1, 120);
+    ui->tableClients->setColumnWidth(2, 120);
+    ui->tableClients->setColumnWidth(3, 60);
+    ui->tableClients->setColumnWidth(4, 100);
+    ui->tableClients->setColumnWidth(5, 120);
+    ui->tableClients->setColumnWidth(6, 80);
+    ui->tableClients->setColumnWidth(7, 120);
+
+    int row = 0;
+    while (query.next()) {
+        ui->tableClients->insertRow(row);
+
+        int id = query.value(0).toInt();
+        QString nom = query.value(1).toString();
+        QString prenom = query.value(2).toString();
+        int telephone = query.value(3).toInt();
+        QDate dateNaissance = query.value(4).toDate();
+        QString statut = query.value(5).toString();
+        QString sexe = query.value(6).toString();
+
+        // Calculer l'âge
+        int age = dateNaissance.daysTo(QDate::currentDate()) / 365;
+
+        // ID (non éditable)
+        QTableWidgetItem *itemId = new QTableWidgetItem(QString::number(id));
+        itemId->setFlags(itemId->flags() & ~Qt::ItemIsEditable);
+        ui->tableClients->setItem(row, 0, itemId);
+
+        // Nom
+        ui->tableClients->setItem(row, 1, new QTableWidgetItem(nom));
+
+        // Prénom
+        ui->tableClients->setItem(row, 2, new QTableWidgetItem(prenom));
+
+        // Âge (non éditable)
+        QTableWidgetItem *itemAge = new QTableWidgetItem(QString::number(age));
+        itemAge->setFlags(itemAge->flags() & ~Qt::ItemIsEditable);
+        ui->tableClients->setItem(row, 3, itemAge);
+
+        // Statut
+        ui->tableClients->setItem(row, 4, new QTableWidgetItem(statut));
+
+        // Téléphone
+        ui->tableClients->setItem(row, 5, new QTableWidgetItem(QString::number(telephone)));
+
+        // Sexe
+        QString sexeTexte = (sexe == "H") ? "Homme" : "Femme";
+        ui->tableClients->setItem(row, 6, new QTableWidgetItem(sexeTexte));
+
+        // Boutons Actions (SUP et SMS)
+        QWidget *actionsWidget = new QWidget();
+        QHBoxLayout *layout = new QHBoxLayout(actionsWidget);
+        layout->setContentsMargins(3, 1, 3, 1);
+        layout->setSpacing(4);
+
+        QPushButton *btnSupp = new QPushButton("SUP");
+        QPushButton *btnSMS = new QPushButton("SMS");
+        btnSupp->setFixedSize(45, 26);
+        btnSMS->setFixedSize(45, 26);
+        btnSupp->setStyleSheet("background:#e74c3c; color:white; border-radius:4px; font-weight:bold;");
+        btnSMS->setStyleSheet("background:#6c5ce7; color:white; border-radius:4px; font-weight:bold;");
+
+        layout->addWidget(btnSupp);
+        layout->addWidget(btnSMS);
+
+        connect(btnSupp, &QPushButton::clicked, this, [this, id]() {
+            if (QMessageBox::question(this, "Supprimer",
+                                      "Supprimer le client ID <b>" + QString::number(id) + "</b> ?",
+                                      QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+                QString err;
+                if (gestion_client::supprimerClient(id, err)) {
+                    QMessageBox::information(this, "Succès", err);
+                    on_searchLineEdit_3_textChanged(ui->searchLineEdit_3->text());
+                    rafraichirStatistiquesClients();
+                } else {
+                    QMessageBox::critical(this, "Erreur", err);
+                }
+            }
+        });
+
+        connect(btnSMS, &QPushButton::clicked, this, [this, telephone, clientName = prenom + " " + nom]() {
+            SMS_client *smsWindow = new SMS_client(this, QString::number(telephone), clientName);
+            smsWindow->exec();
+            smsWindow->deleteLater();
+        });
+
+        ui->tableClients->setCellWidget(row, 7, actionsWidget);
+        row++;
+    }
+
+    ui->tableClients->blockSignals(false);
+    ui->tableClients->verticalHeader()->setDefaultSectionSize(40);
+}
+/*void MainWindow::on_btnExporter_3_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this, "Exporter PDF", "clients.pdf", "PDF (*.pdf)");
     if (fileName.isEmpty()) return;
@@ -1365,7 +1642,7 @@ void MainWindow::on_btnExporter_3_clicked()
     tableFormat.setCellPadding(5);
     tableFormat.setAlignment(Qt::AlignCenter);
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 100));
-
+    // Construction du tableau HTML
     QTextTable *table = cursor.insertTable(visibleRows + 1, 7, tableFormat);
 
     // En-têtes
@@ -1393,6 +1670,165 @@ void MainWindow::on_btnExporter_3_clicked()
 
     doc.print(&printer);
     QMessageBox::information(this, "Succès", "PDF exporté avec succès !");
+}*/
+void MainWindow::on_btnExporter_3_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, "Exporter PDF", "clients.pdf", "PDF (*.pdf)");
+    if (fileName.isEmpty()) return;
+
+    Connection c;
+    if (!c.createconnect()) {
+        QMessageBox::critical(this, "Erreur", "Connexion échouée !");
+        return;
+    }
+
+    // Construire la requête SQL selon les filtres actuels
+    QString filtreSelectionne = ui->comboProfession_3->currentText();
+    QString recherche = ui->searchLineEdit_3->text().trimmed();
+
+    QString sql = "SELECT ID_CLIENT, NOM, PRENOM, NUM_TEL, DATE_DE_NAISSANCE, "
+                  "STATUT, SEXE FROM CLIENT WHERE 1=1 ";
+
+    // Ajouter les conditions de filtrage (même logique que appliquerFiltreAvecSQL)
+    if (filtreSelectionne == "Âge: Moins de 30 ans") {
+        sql += "AND (SYSDATE - DATE_DE_NAISSANCE) / 365 < 30 ";
+    }
+    else if (filtreSelectionne == "Âge: 30 ans et plus") {
+        sql += "AND (SYSDATE - DATE_DE_NAISSANCE) / 365 >= 30 ";
+    }
+    else if (filtreSelectionne == "Statut: Nouveau") {
+        sql += "AND STATUT = 'Nouveau' ";
+    }
+    else if (filtreSelectionne == "Statut: Ancien") {
+        sql += "AND STATUT = 'Ancien' ";
+    }
+    else if (filtreSelectionne == "Statut: VIP") {
+        sql += "AND STATUT = 'VIP' ";
+    }
+    else if (filtreSelectionne == "Sexe: Homme") {
+        sql += "AND SEXE = 'H' ";
+    }
+    else if (filtreSelectionne == "Sexe: Femme") {
+        sql += "AND SEXE = 'F' ";
+    }
+
+    // Ajouter la recherche textuelle si présente
+    if (!recherche.isEmpty()) {
+        sql += "AND (CAST(ID_CLIENT AS VARCHAR(10)) LIKE :recherche "
+               "OR UPPER(NOM) LIKE UPPER(:recherche) "
+               "OR UPPER(PRENOM) LIKE UPPER(:recherche)) ";
+    }
+
+    sql += "ORDER BY ID_CLIENT";
+
+    QSqlQuery query;
+    query.prepare(sql);
+
+    if (!recherche.isEmpty()) {
+        query.bindValue(":recherche", "%" + recherche + "%");
+    }
+
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Erreur", "Échec de l'exportation : " + query.lastError().text());
+        return;
+    }
+
+    // Compter les résultats
+    int totalClients = 0;
+    QVector<QStringList> donnees;
+
+    while (query.next()) {
+        totalClients++;
+
+        int id = query.value(0).toInt();
+        QString nom = query.value(1).toString();
+        QString prenom = query.value(2).toString();
+        int telephone = query.value(3).toInt();
+        QDate dateNaissance = query.value(4).toDate();
+        QString statut = query.value(5).toString();
+        QString sexe = query.value(6).toString();
+
+        // Calculer l'âge
+        int age = dateNaissance.daysTo(QDate::currentDate()) / 365;
+        QString sexeTexte = (sexe == "H") ? "Homme" : "Femme";
+
+        QStringList ligne;
+        ligne << QString::number(id)
+              << nom
+              << prenom
+              << QString::number(age)
+              << statut
+              << QString::number(telephone)
+              << sexeTexte;
+
+        donnees.append(ligne);
+    }
+
+    if (totalClients == 0) {
+        QMessageBox::warning(this, "Aucune donnée", "Aucun client à exporter !");
+        return;
+    }
+
+    // Créer le PDF
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(fileName);
+    printer.setPageSize(QPageSize::A4);
+    printer.setPageMargins(QMarginsF(15, 15, 15, 15), QPageLayout::Millimeter);
+
+    QTextDocument doc;
+    QTextCursor cursor(&doc);
+
+    // Titre
+    cursor.insertHtml("<h1 style='text-align:center;'>Liste des Clients</h1>");
+
+    // Informations sur le filtre
+    if (filtreSelectionne != "Tous les filtres" || !recherche.isEmpty()) {
+        QString infoFiltre = "<p style='text-align:center; color:#666;'>";
+        if (filtreSelectionne != "Tous les filtres") {
+            infoFiltre += "Filtre: <b>" + filtreSelectionne + "</b>";
+        }
+        if (!recherche.isEmpty()) {
+            if (filtreSelectionne != "Tous les filtres") infoFiltre += " | ";
+            infoFiltre += "Recherche: <b>" + recherche + "</b>";
+        }
+        infoFiltre += "</p>";
+        cursor.insertHtml(infoFiltre);
+    }
+
+    cursor.insertHtml("<p style='text-align:center;'>Total: <b>" + QString::number(totalClients) + "</b> client(s)</p><br>");
+
+    // Créer le tableau
+    QTextTableFormat tableFormat;
+    tableFormat.setBorder(1);
+    tableFormat.setCellPadding(5);
+    tableFormat.setAlignment(Qt::AlignCenter);
+    tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 100));
+
+    QTextTable *table = cursor.insertTable(totalClients + 1, 7, tableFormat);
+
+    // En-têtes
+    QStringList headers = {"ID", "Nom", "Prénom", "Âge", "Statut", "Téléphone", "Sexe"};
+    QTextCharFormat headerFmt;
+    headerFmt.setFontWeight(QFont::Bold);
+    headerFmt.setBackground(Qt::lightGray);
+
+    for (int col = 0; col < 7; ++col) {
+        table->cellAt(0, col).firstCursorPosition().insertText(headers[col], headerFmt);
+    }
+
+    // Données
+    for (int row = 0; row < donnees.size(); ++row) {
+        for (int col = 0; col < 7; ++col) {
+            table->cellAt(row + 1, col).firstCursorPosition().insertText(donnees[row][col]);
+        }
+    }
+
+    // Imprimer le PDF
+    doc.print(&printer);
+
+    QMessageBox::information(this, "Succès",
+                             QString("PDF exporté avec succès !\n%1 client(s) exporté(s).").arg(totalClients));
 }
 void MainWindow::on_tableClients_doubleClicked(const QModelIndex &index)
 {
@@ -1450,6 +1886,49 @@ void MainWindow::chargerEtAfficherClient(int id)
         return;
     }
 
+    // MAINTENANT ON CHARGE LA PHOTO ET L'ORDONNANCE DEPUIS LA BASE 
+    Connection c;
+    if (c.createconnect()) {
+        QSqlQuery query;
+        query.prepare("SELECT PHOTO, ORDONNANCE, DATE_DE_NAISSANCE FROM CLIENT WHERE ID_CLIENT = :id");
+        query.bindValue(":id", id);
+
+        if (query.exec() && query.next()) {
+
+            // Charger la photo depuis la base
+            QString photo = query.value(0).toString();
+            if (!photo.isEmpty()) {
+                QString photoCheminComplet = "photos_clients/" + photo;
+                if (QFile::exists(photoCheminComplet)) {
+                    photoPath = photoCheminComplet;
+                    afficherPhotoPleinCadre(photoPath);  // ⭐ NOUVELLE LIGNE
+                    ui->lineEditPhoto->setText(photo);
+                }
+            } else {
+                // Pas de photo dans la base
+                photoPath = "";
+                ui->lineEditPhoto->clear();
+                ui->lblphoto->setPixmap(QPixmap(":/new/prefix1/uplode-removebg-preview.png"));
+            }
+
+            // Charger l'ordonnance depuis la base
+            QString ordonnance = query.value(1).toString();
+            if (!ordonnance.isEmpty()) {
+                ordonnancePath = "ordonnances_clients/" + ordonnance;
+                ui->lineEditOrdonnance->setText(ordonnance);
+            } else {
+                ordonnancePath = "";
+                ui->lineEditOrdonnance->clear();
+            }
+
+            // Charger la date de naissance depuis la base
+           /* QDate dateNaissance = query.value(2).toDate();
+            if (dateNaissance.isValid()) {
+                ui->lineEditDateNaissance_4->setText(dateNaissance.toString("yyyy-MM-dd"));
+            }*/
+        }
+    }
+
     // Aller à la page d'ajout/modification
     ui->stackedWidget_4->setCurrentIndex(2);
 
@@ -1476,6 +1955,33 @@ void MainWindow::chargerEtAfficherClient(int id)
 
     // Désactiver la modification de l'ID
     ui->lineEditID_3->setEnabled(false);
+    if (!client.getPhoto().isEmpty()) {
+        QString photoCheminComplet = "photos_clients/" + client.getPhoto();
+        if (QFile::exists(photoCheminComplet)) {
+            photoPath = photoCheminComplet;
+            QPixmap pixmap(photoPath);
+            if (!pixmap.isNull()) {
+                QPixmap scaledPixmap = pixmap.scaled(ui->lblphoto->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                ui->lblphoto->setPixmap(scaledPixmap);
+            }
+            ui->lineEditPhoto->setText(client.getPhoto());
+        }
+    }
+
+    if (!client.getPhoto().isEmpty()) {
+        QString photoCheminComplet = "photos_clients/" + client.getPhoto();
+        if (QFile::exists(photoCheminComplet)) {
+            photoPath = photoCheminComplet;
+            afficherPhotoPleinCadre(photoPath);  // ⭐ NOUVELLE LIGNE
+            ui->lineEditPhoto->setText(client.getPhoto());
+        }
+    }
+
+    if (!client.getOrdonnance().isEmpty()) {
+        ordonnancePath = "ordonnances_clients/" + client.getOrdonnance();
+        ui->lineEditOrdonnance->setText(client.getOrdonnance());  // ← Ici aussi
+    }
+
 
     // Changer le texte du bouton
     ui->btnConfirmer_3->setText("Modifier le client");
@@ -1490,7 +1996,7 @@ bool MainWindow::modifierClientExistant(int id, const QString &nom, const QStrin
     return gestion_client::modifierClient(id, nom, prenom, telephone, dateNaissance,
                                           statut, sexe, ordonnance, photo, erreurMessage);
 }
-// Fonction principale appelée quand le filtre change
+/*// Fonction principale appelée quand le filtre change
 void MainWindow::onFiltresChanged()
 {
     QString filtreSelectionne = ui->comboProfession_3->currentText();
@@ -1500,10 +2006,10 @@ void MainWindow::onFiltresChanged()
     } else {
         appliquerFiltre(filtreSelectionne);
     }
-}
+}*/
 
 // Applique un filtre spécifique
-void MainWindow::appliquerFiltre(const QString &filtre)
+/*void MainWindow::appliquerFiltre(const QString &filtre)
 {
     int visibleCount = 0;
 
@@ -1517,8 +2023,190 @@ void MainWindow::appliquerFiltre(const QString &filtre)
     // Optionnel: Afficher le nombre de résultats
     qDebug() << "Filtre" << filtre << ":" << visibleCount << "client(s) trouvé(s)";
 }
+*/
+void MainWindow::onFiltresChanged()
+{
+    QString filtreSelectionne = ui->comboProfession_3->currentText();
+    QString recherche = ui->searchLineEdit_3->text().trimmed();
 
-// Réinitialise tous les filtres (affiche tous les clients)
+    appliquerFiltreAvecSQL(filtreSelectionne, recherche);
+}
+
+void MainWindow::appliquerFiltreAvecSQL(const QString &filtre, const QString &recherche)
+{
+    // Bloquer les signaux pendant le rafraîchissement
+    ui->tableClients->blockSignals(true);
+    ui->tableClients->setRowCount(0);
+
+    Connection c;
+    if (!c.createconnect()) {
+        QMessageBox::critical(this, "Erreur", "Connexion échouée !");
+        ui->tableClients->blockSignals(false);
+        return;
+    }
+
+    QSqlQuery query;
+    QString sql = "SELECT ID_CLIENT, NOM, PRENOM, NUM_TEL, DATE_DE_NAISSANCE, "
+                  "STATUT, SEXE FROM CLIENT WHERE 1=1 ";
+
+    // Ajouter les conditions de filtrage
+    if (filtre == "Âge: Moins de 30 ans") {
+        sql += "AND (SYSDATE - DATE_DE_NAISSANCE) / 365 < 30 ";
+    }
+    else if (filtre == "Âge: 30 ans et plus") {
+        sql += "AND (SYSDATE - DATE_DE_NAISSANCE) / 365 >= 30 ";
+    }
+    else if (filtre == "Statut: Nouveau") {
+        sql += "AND STATUT = 'Nouveau' ";
+    }
+    else if (filtre == "Statut: Ancien") {
+        sql += "AND STATUT = 'Ancien' ";
+    }
+    else if (filtre == "Statut: VIP") {
+        sql += "AND STATUT = 'VIP' ";
+    }
+    else if (filtre == "Sexe: Homme") {
+        sql += "AND SEXE = 'H' ";
+    }
+    else if (filtre == "Sexe: Femme") {
+        sql += "AND SEXE = 'F' ";
+    }
+
+    // Ajouter la recherche textuelle si présente
+    if (!recherche.isEmpty()) {
+        sql += "AND (CAST(ID_CLIENT AS VARCHAR(10)) LIKE :recherche "
+               "OR UPPER(NOM) LIKE UPPER(:recherche) "
+               "OR UPPER(PRENOM) LIKE UPPER(:recherche)) ";
+    }
+
+    sql += "ORDER BY ID_CLIENT";
+
+    query.prepare(sql);
+
+    if (!recherche.isEmpty()) {
+        query.bindValue(":recherche", "%" + recherche + "%");
+    }
+
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Erreur", "Échec du filtrage : " + query.lastError().text());
+        ui->tableClients->blockSignals(false);
+        return;
+    }
+
+    // Configuration du tableau
+    ui->tableClients->setColumnCount(8);
+    QStringList headers = {"ID", "Nom", "Prénom", "Âge", "Statut", "Téléphone", "Sexe", "Actions"};
+    ui->tableClients->setHorizontalHeaderLabels(headers);
+
+    ui->tableClients->setColumnWidth(0, 120);
+    ui->tableClients->setColumnWidth(1, 120);
+    ui->tableClients->setColumnWidth(2, 120);
+    ui->tableClients->setColumnWidth(3, 60);
+    ui->tableClients->setColumnWidth(4, 100);
+    ui->tableClients->setColumnWidth(5, 120);
+    ui->tableClients->setColumnWidth(6, 80);
+    ui->tableClients->setColumnWidth(7, 120);
+
+    int row = 0;
+    int totalClients = 0;
+
+    while (query.next()) {
+        totalClients++;
+        ui->tableClients->insertRow(row);
+
+        int id = query.value(0).toInt();
+        QString nom = query.value(1).toString();
+        QString prenom = query.value(2).toString();
+        int telephone = query.value(3).toInt();
+        QDate dateNaissance = query.value(4).toDate();
+        QString statut = query.value(5).toString();
+        QString sexe = query.value(6).toString();
+
+        // Calculer l'âge
+        int age = dateNaissance.daysTo(QDate::currentDate()) / 365;
+
+        // ID (non éditable)
+        QTableWidgetItem *itemId = new QTableWidgetItem(QString::number(id));
+        itemId->setFlags(itemId->flags() & ~Qt::ItemIsEditable);
+        ui->tableClients->setItem(row, 0, itemId);
+
+        // Nom
+        ui->tableClients->setItem(row, 1, new QTableWidgetItem(nom));
+
+        // Prénom
+        ui->tableClients->setItem(row, 2, new QTableWidgetItem(prenom));
+
+        // Âge (non éditable)
+        QTableWidgetItem *itemAge = new QTableWidgetItem(QString::number(age));
+        itemAge->setFlags(itemAge->flags() & ~Qt::ItemIsEditable);
+        ui->tableClients->setItem(row, 3, itemAge);
+
+        // Statut
+        ui->tableClients->setItem(row, 4, new QTableWidgetItem(statut));
+
+        // Téléphone
+        ui->tableClients->setItem(row, 5, new QTableWidgetItem(QString::number(telephone)));
+
+        // Sexe
+        QString sexeTexte = (sexe == "H") ? "Homme" : "Femme";
+        ui->tableClients->setItem(row, 6, new QTableWidgetItem(sexeTexte));
+
+        // Boutons Actions
+        QWidget *actionsWidget = new QWidget();
+        QHBoxLayout *layout = new QHBoxLayout(actionsWidget);
+        layout->setContentsMargins(3, 1, 3, 1);
+        layout->setSpacing(4);
+
+        QPushButton *btnSupp = new QPushButton("SUP");
+        QPushButton *btnSMS = new QPushButton("SMS");
+        btnSupp->setFixedSize(45, 26);
+        btnSMS->setFixedSize(45, 26);
+        btnSupp->setStyleSheet("background:#e74c3c; color:white; border-radius:4px; font-weight:bold;");
+        btnSMS->setStyleSheet("background:#6c5ce7; color:white; border-radius:4px; font-weight:bold;");
+
+        layout->addWidget(btnSupp);
+        layout->addWidget(btnSMS);
+
+        connect(btnSupp, &QPushButton::clicked, this, [this, id, filtre, recherche]() {
+            if (QMessageBox::question(this, "Supprimer",
+                                      "Supprimer le client ID <b>" + QString::number(id) + "</b> ?",
+                                      QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+                QString err;
+                if (gestion_client::supprimerClient(id, err)) {
+                    QMessageBox::information(this, "Succès", err);
+                    appliquerFiltreAvecSQL(filtre, recherche);
+                    rafraichirStatistiquesClients();
+                } else {
+                    QMessageBox::critical(this, "Erreur", err);
+                }
+            }
+        });
+
+        connect(btnSMS, &QPushButton::clicked, this, [this, telephone, clientName = prenom + " " + nom]() {
+            SMS_client *smsWindow = new SMS_client(this, QString::number(telephone), clientName);
+            smsWindow->exec();
+            smsWindow->deleteLater();
+        });
+
+        ui->tableClients->setCellWidget(row, 7, actionsWidget);
+        row++;
+    }
+
+    ui->tableClients->blockSignals(false);
+    ui->tableClients->verticalHeader()->setDefaultSectionSize(40);
+
+    // Afficher le nombre de résultats
+    qDebug() << "Filtre appliqué:" << filtre << "- Résultats:" << totalClients;
+}
+
+// Fonction pour réinitialiser (afficher tous)
+void MainWindow::reinitialiserFiltres()
+{
+    ui->comboProfession_3->setCurrentIndex(0); // "Tous les filtres"
+    ui->searchLineEdit_3->clear();
+    rafraichirTableauClients();
+}
+/*// Réinitialise tous les filtres (affiche tous les clients)
 void MainWindow::reinitialiserFiltres()
 {
     for (int i = 0; i < ui->tableClients->rowCount(); ++i) {
@@ -1527,7 +2215,7 @@ void MainWindow::reinitialiserFiltres()
 
     qDebug() << "Tous les filtres réinitialisés";
 }
-
+*/
 // Vérifie si une ligne correspond à un filtre donné
 bool MainWindow::ligneCorrespondFiltre(int row, const QString &filtre)
 {
@@ -1591,7 +2279,399 @@ void MainWindow::validerTelephone(const QString &text) {
     bool valid = ok && text.length() == 8;
     ui->lineEditPhone_3->setStyleSheet(valid ? "border: 2px solid green;" : "border: 2px solid red; background-color: #FFE6E6;");
 }
+void MainWindow::rafraichirStatistiquesClients()
+{
+    if (m_statsWidget) {
+        m_statsWidget->rafraichirStatistiques();
+    }
+}
+void MainWindow::onPageChanged()
+{
+    // Vérifier si nous sommes dans la page "Liste des clients"
+    bool isClientPage = (ui->stackedWidget->currentWidget() == ui->clients);
+    bool isClientListPage = (ui->stackedWidget_4->currentIndex() == 0); // Index 0 = page_7 (liste)
 
+    if (m_statsWidget) {
+        m_statsWidget->setVisible(isClientPage && isClientListPage);
+
+        // Rafraîchir les statistiques si on arrive sur la page liste des clients
+        if (isClientPage && isClientListPage) {
+            rafraichirStatistiquesClients();
+        }
+    }
+}
+void MainWindow::decrementerQuantiteProduit(int idProduit)
+{
+    Connection c;
+    if (!c.createconnect()) {
+        QMessageBox::critical(this, "Erreur", "Connexion à la base de données échouée !");
+        return;
+    }
+
+    // Vérifier d'abord si le produit existe
+    QSqlQuery checkQuery;
+    checkQuery.prepare("SELECT QUANTITÉ, MARQUE, MODELE FROM PRODUIT WHERE ID_PRODUIT = :id");
+    checkQuery.bindValue(":id", idProduit);
+
+    if (checkQuery.exec() && checkQuery.next()) {
+        int quantiteActuelle = checkQuery.value(0).toInt();
+        QString marque = checkQuery.value(1).toString();
+        QString modele = checkQuery.value(2).toString();
+
+        if (quantiteActuelle > 0) {
+            // Décrémenter la quantité
+            QSqlQuery updateQuery;
+            updateQuery.prepare("UPDATE PRODUIT SET QUANTITÉ = QUANTITÉ - 1 WHERE ID_PRODUIT = :id");
+            updateQuery.bindValue(":id", idProduit);
+
+            if (updateQuery.exec()) {
+                qDebug() << "Quantité décrémentée pour le produit ID:" << idProduit;
+
+                // Message de confirmation
+                QMessageBox::information(this, "Achat enregistré",
+                                         QString("Produit acheté avec succès!\n"
+                                                 "ID: %1\n"
+                                                 "Marque: %2\n"
+                                                 "Modèle: %3\n"
+                                                 "Nouveau stock: %4")
+                                             .arg(idProduit)
+                                             .arg(marque)
+                                             .arg(modele)
+                                             .arg(quantiteActuelle - 1));
+
+                // Mettre à jour l'affichage des produits
+                rafraichirTableauProduit();
+
+            } else {
+                QMessageBox::critical(this, "Erreur",
+                                      "Erreur lors de la mise à jour du stock: " + updateQuery.lastError().text());
+            }
+        } else {
+            QMessageBox::warning(this, "Stock épuisé",
+                                 QString("Le produit ID %1 (%2 %3) n'est plus en stock !")
+                                     .arg(idProduit)
+                                     .arg(marque)
+                                     .arg(modele));
+        }
+    } else {
+        QMessageBox::warning(this, "Produit introuvable",
+                             QString("Aucun produit trouvé avec l'ID: %1").arg(idProduit));
+    }
+}
+
+// ⭐⭐ FONCTION : Générer un nom court pour les fichiers
+
+QString MainWindow::genererNomCourt(const QString &cheminOriginal, const QString &prefixe)
+{
+    if (cheminOriginal.isEmpty()) return "";
+
+    QFileInfo fileInfo(cheminOriginal);
+    QString extension = fileInfo.suffix();
+
+    // Générer un nom court : prefixe + timestamp + .ext
+    QString nomCourt = QString("%1_%2.%3")
+                           .arg(prefixe.left(3))
+                           .arg(QDateTime::currentSecsSinceEpoch())
+                           .arg(extension.left(3));
+
+    return nomCourt.left(20);
+}
+
+// ============================================================================
+// ⭐⭐ FONCTION : Copier le fichier vers le dossier de l'app
+// ============================================================================
+QString MainWindow::copierFichierVersDossierApp(const QString &sourcePath, const QString &dossier, const QString &prefixe)
+{
+    if (sourcePath.isEmpty()) return "";
+
+    QDir dir;
+    if (!dir.exists(dossier)) {
+        dir.mkpath(dossier);
+    }
+
+    QString nomCourt = genererNomCourt(sourcePath, prefixe);
+    QString destinationPath = dossier + "/" + nomCourt;
+
+    if (QFile::copy(sourcePath, destinationPath)) {
+        return nomCourt;
+    }
+
+    return QString("%1.%2").arg(prefixe.left(3)).arg(QFileInfo(sourcePath).suffix().left(3));
+}
+
+/*void MainWindow::on_btnUploadPhoto_clicked()
+{
+    QString filePath = QFileDialog::getOpenFileName(this,
+                                                    "Choisir une photo",
+                                                    QDir::homePath(),
+                                                    "Images (*.png *.jpg *.jpeg *.bmp *.gif)");
+
+    if (!filePath.isEmpty()) {
+        // ⭐ VALIDATION DU VISAGE HUMAIN
+        QString erreurValidation;
+        if (!validerVisageHumain(filePath, erreurValidation)) {
+            QMessageBox::warning(this, "Photo invalide", erreurValidation);
+            return; // Ne pas accepter la photo
+        }
+
+        // ✅ Photo validée !
+        QString nomFichier = QFileInfo(filePath).fileName();
+        if (nomFichier.length() > 20) {
+            QMessageBox::warning(this, "Nom trop long",
+                                 "Le nom sera renommé automatiquement.");
+        }
+
+        photoPath = filePath;
+
+        // Afficher l'aperçu
+        QPixmap pixmap(photoPath);
+        if (!pixmap.isNull()) {
+            QPixmap scaledPixmap = pixmap.scaled(ui->lblphoto->size(),
+                                                 Qt::KeepAspectRatio,
+                                                 Qt::SmoothTransformation);
+            ui->lblphoto->setPixmap(scaledPixmap);
+        }
+
+        QString nomCourt = genererNomCourt(photoPath, "photo");
+        ui->lineEditPhoto->setText(nomCourt);
+
+        // Message de confirmation
+        QMessageBox::information(this, "✅ Photo validée",
+                                 "Visage humain détecté avec succès !\n"
+                                 "La photo est acceptée.");
+    }
+}*/
+void MainWindow::on_btnUploadPhoto_clicked()
+{
+    QString filePath = QFileDialog::getOpenFileName(this,
+                                                    "Choisir une photo",
+                                                    QDir::homePath(),
+                                                    "Images (*.png *.jpg *.jpeg *.bmp *.gif)");
+
+    if (!filePath.isEmpty()) {
+        QString erreurValidation;
+        if (!validerVisageHumain(filePath, erreurValidation)) {
+            QMessageBox::warning(this, "Photo invalide", erreurValidation);
+            return;
+        }
+
+        QString nomFichier = QFileInfo(filePath).fileName();
+        if (nomFichier.length() > 20) {
+            QMessageBox::warning(this, "Nom trop long",
+                                 "Le nom sera renommé automatiquement.");
+        }
+
+        photoPath = filePath;
+
+        // ⭐ NOUVELLE LIGNE - SIMPLE ET PROPRE ⭐
+        afficherPhotoPleinCadre(photoPath);
+
+        QString nomCourt = genererNomCourt(photoPath, "photo");
+        ui->lineEditPhoto->setText(nomCourt);
+
+        QMessageBox::information(this, "✅ Photo validée",
+                                 "Visage humain détecté avec succès !\n"
+                                 "La photo est acceptée.");
+    }
+}
+
+// ⭐⭐ FONCTION : Upload de l'ordonnance
+
+void MainWindow::on_btnUploadOrdonnance_clicked()
+{
+    QString filePath = QFileDialog::getOpenFileName(this,
+                                                    "Choisir une ordonnance",
+                                                    QDir::homePath(),
+                                                    "Documents (*.pdf *.png *.jpg *.jpeg);;PDF (*.pdf);;Images (*.png *.jpg *.jpeg)"
+                                                    );
+
+    if (!filePath.isEmpty()) {
+        QString nomFichier = QFileInfo(filePath).fileName();
+        if (nomFichier.length() > 20) {
+            QMessageBox::warning(this, "Nom trop long",
+                                 "Le nom du fichier est trop long. Il sera renommé automatiquement.");
+        }
+
+        ordonnancePath = filePath;
+        QString nomCourt = genererNomCourt(ordonnancePath, "ordo");
+        ui->lineEditOrdonnance->setText(nomCourt);
+    }
+}
+
+// ⭐ FONCTION : AFFICHER PHOTO EN PLEIN CADRE (AVEC RECADRAGE)
+
+void MainWindow::afficherPhotoPleinCadre(const QString &cheminPhoto)
+{
+    // Charger l'image
+    QPixmap pixmap(cheminPhoto);
+
+    // Si l'image est invalide, afficher l'image par défaut
+    if (pixmap.isNull()) {
+        ui->lblphoto->setPixmap(QPixmap(":/new/prefix1/uplode-removebg-preview.png"));
+        return;
+    }
+
+    // Obtenir la taille du label
+    QSize labelSize = ui->lblphoto->size();
+
+    // Calculer les ratios (proportions)
+    double imgRatio = (double)pixmap.width() / pixmap.height();
+    double labelRatio = (double)labelSize.width() / labelSize.height();
+
+    QPixmap croppedPixmap;
+
+    if (imgRatio > labelRatio) {
+        // L'IMAGE EST PLUS LARGE que le cadre
+        // → On recadre les côtés gauche/droite
+        int newWidth = pixmap.height() * labelRatio;
+        int x = (pixmap.width() - newWidth) / 2;  // Centrer horizontalement
+        croppedPixmap = pixmap.copy(x, 0, newWidth, pixmap.height());
+
+    } else {
+        // L'IMAGE EST PLUS HAUTE que le cadre
+        // → On recadre le haut/bas
+        int newHeight = pixmap.width() / labelRatio;
+        int y = (pixmap.height() - newHeight) / 2;  // Centrer verticalement
+        croppedPixmap = pixmap.copy(0, y, pixmap.width(), newHeight);
+    }
+
+    // Redimensionner l'image recadrée à la taille exacte du label
+    QPixmap scaledPixmap = croppedPixmap.scaled(labelSize,
+                                                Qt::IgnoreAspectRatio,
+                                                Qt::SmoothTransformation);
+
+    // Afficher l'image
+    ui->lblphoto->setPixmap(scaledPixmap);
+}
+
+bool MainWindow::validerVisageHumain(const QString &cheminPhoto, QString &erreurMessage)
+{
+    try {
+        cv::Mat image = cv::imread(cheminPhoto.toStdString());
+        if (image.empty()) {
+            erreurMessage = "❌ Impossible de charger l'image !";
+            return false;
+        }
+
+        qDebug() << "📷 Image chargée:" << image.cols << "x" << image.rows;
+
+        // Redimensionner doucement
+        if (image.rows > 800 || image.cols > 800) {
+            cv::resize(image, image, cv::Size(600, 600));
+        }
+        // CONVERTIR EN NIVEAUX DE GRIS
+        cv::Mat grayImage;
+        cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY);
+        cv::equalizeHist(grayImage, grayImage);
+
+        // Charger le détecteur
+        cv::CascadeClassifier faceCascade;
+        QString cascadePath = QCoreApplication::applicationDirPath() + "/haarcascade_frontalface_default.xml";
+
+        if (!faceCascade.load(cascadePath.toStdString())) {
+            erreurMessage = "❌ Fichier de détection introuvable !";
+            return false;
+        }
+
+        // DÉTECTER LES VISAGES
+        std::vector<cv::Rect> faces;
+
+        // Premier essai avec paramètres standards
+        faceCascade.detectMultiScale(grayImage, faces, 1.1, 4, 0, cv::Size(60, 60));
+
+        qDebug() << "🔍 Visages détectés (premier passage):" << faces.size();
+
+        // Si aucun visage, essayer avec des paramètres plus sensibles
+        if (faces.empty()) {
+            faceCascade.detectMultiScale(grayImage, faces, 1.05, 3, 0, cv::Size(40, 40));
+            qDebug() << "🔍 Visages détectés (second passage):" << faces.size();
+        }
+
+        // ⭐ REFUSER LES MULTIPLES VISAGES
+        if (faces.size() > 1) {
+            erreurMessage = QString("❌ Photo refusée !\n\n"
+                                    "%1 visages détectés.\n\n"
+                                    "Une seule personne par photo est autorisée.")
+                                .arg(faces.size());
+            return false;
+        }
+
+        // ⭐ ACCEPTER SI 1 VISAGE DÉTECTÉ (sans filtrage trop strict)
+        if (faces.size() == 1) {
+            cv::Rect face = faces[0];
+            double ratio = (double)face.width / face.height;
+
+            qDebug() << "✅ Visage détecté - Ratio:" << ratio
+                     << "Taille:" << face.width << "x" << face.height
+                     << "Position:" << face.x << "," << face.y;
+
+            // Vérifications basiques uniquement
+            if (ratio < 0.5 || ratio > 2.0) {
+                erreurMessage = "❌ Format de visage inhabituel !";
+                return false;
+            }
+
+            if (face.width < 30 || face.height < 30) {
+                erreurMessage = "❌ Visage trop petit !";
+                return false;
+            }
+
+            qDebug() << "🎉 Photo acceptée - 1 visage détecté";
+            return true;
+        }
+
+        // ⭐ SI AUCUN VISAGE
+        erreurMessage = "❌ Aucun visage détecté !\n\n"
+                        "Conseils :\n"
+                        "• Photo bien éclairée\n"
+                        "• Visage face à la caméra\n"
+                        "• Pas trop loin/près\n"
+                        "• Fond simple";
+        return false;
+
+    } catch (const cv::Exception& e) {
+        erreurMessage = QString("❌ Erreur OpenCV : %1").arg(e.what());
+        qDebug() << "❌ OpenCV Exception:" << e.what();
+        return false;
+    } catch (...) {
+        erreurMessage = "❌ Erreur inconnue lors de l'analyse";
+        return false;
+    }
+}
+void MainWindow::verifierInstallationOpenCV()
+{
+    qDebug() << "=== VÉRIFICATION OPENCV ===";
+
+    // Vérifier la version
+    qDebug() << "Version OpenCV:" << CV_VERSION;
+
+    // Vérifier les chemins des cascades
+    QStringList cascadesToCheck = {
+        "C:/opencv-mingw/OpenCV-MinGW-Build-OpenCV-4.5.5-x64/etc/haarcascades/",
+        "C:/opencv/build/etc/haarcascades/",
+        QCoreApplication::applicationDirPath() + "/"
+    };
+
+    QStringList cascadeFiles = {
+        "haarcascade_frontalface_default.xml",
+        "haarcascade_frontalface_alt.xml",
+        "haarcascade_frontalface_alt2.xml"
+    };
+
+    for (const QString& basePath : cascadesToCheck) {
+        qDebug() << "🔍 Checking:" << basePath;
+        for (const QString& file : cascadeFiles) {
+            QString fullPath = basePath + file;
+            if (QFile::exists(fullPath)) {
+                qDebug() << "   ✅" << file;
+            } else {
+                qDebug() << "   ❌" << file << "(manquant)";
+            }
+        }
+    }
+    qDebug() << "=== FIN VÉRIFICATION ===";
+}
 MainWindow::~MainWindow() {
+    delete lineEditIDProduit;
     delete ui;
 }

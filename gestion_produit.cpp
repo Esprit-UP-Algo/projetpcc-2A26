@@ -173,9 +173,10 @@ bool Gestion_Produit::ajouterProduit(int id, const QString &marque, const QStrin
     QSqlQuery query(db);
     query.prepare(
         "INSERT INTO PRODUIT (ID_PRODUIT, MARQUE, MODELE, TYPE, COULEUR, PRIX, "
-        "REMISE, QUANTITÉ, MATIERE, GENRE, DATE_A, ID_CLIENT, ID_FOURNISSEUR, ID_LOCAL) "
+        "REMISE, QUANTITÉ, MATIERE, GENRE, DATE_A, ID_CLIENT, ID_FOURNISSEUR) "
         "VALUES (:id, :marque, :modele, :type, :couleur, :prix, :remise, :quantite, "
-        ":matiere, :genre, :date, :idClient, :idFournisseur, :idLocal)"
+        ":matiere, :genre, :date, :idClient, :idFournisseur)"
+
         );
 
     query.bindValue(":id", id);
@@ -297,7 +298,7 @@ bool Gestion_Produit::modifierProduit(int id, const QString &marque, const QStri
         "UPDATE PRODUIT SET MARQUE = :marque, MODELE = :modele, TYPE = :type, "
         "COULEUR = :couleur, PRIX = :prix, REMISE = :remise, QUANTITÉ = :quantite, "
         "MATIERE = :matiere, GENRE = :genre, DATE_A = :date, ID_CLIENT = :idClient, "
-        "ID_FOURNISSEUR = :idFournisseur, ID_LOCAL = :idLocal WHERE ID_PRODUIT = :id"
+        "ID_FOURNISSEUR = :idFournisseur, WHERE ID_PRODUIT = :id"
         );
 
     query.bindValue(":id", id);

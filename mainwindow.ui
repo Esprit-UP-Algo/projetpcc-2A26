@@ -311,7 +311,7 @@ font-size: 20px;
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="personnel">
      <widget class="QStackedWidget" name="stackedWidget_3">
@@ -2256,7 +2256,7 @@ QPushButton:hover {
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="page_7">
        <widget class="QFrame" name="frame_5">
@@ -3159,33 +3159,11 @@ QLabel#photoClient:hover {
           <pixmap resource="mm.qrc">:/new/prefix1/uplode-removebg-preview.png</pixmap>
          </property>
         </widget>
-        <widget class="QTextEdit" name="textEdit">
-         <property name="geometry">
-          <rect>
-           <x>790</x>
-           <y>370</y>
-           <width>121</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QTextEdit {
-    border: 2px solid #dfe6e9;
-    border-radius: 10px;
-    padding: 10px;
-    background-color: white;
-    font-size: 14px;
-}
-QTextEdit:focus {
-    border: 2px solid #6c5ce7;
-}</string>
-         </property>
-        </widget>
         <widget class="QLabel" name="lblordo">
          <property name="geometry">
           <rect>
            <x>580</x>
-           <y>380</y>
+           <y>340</y>
            <width>151</width>
            <height>20</height>
           </rect>
@@ -3232,35 +3210,7 @@ color: rgb(0, 0, 127);
 </string>
          </property>
          <property name="text">
-          <string>Achats recents :</string>
-         </property>
-        </widget>
-        <widget class="QListWidget" name="listachatrecents">
-         <property name="geometry">
-          <rect>
-           <x>790</x>
-           <y>430</y>
-           <width>201</width>
-           <height>91</height>
-          </rect>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QListWidget {
-    background-color: white;
-    border: 2px solid #dfe6e9;
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 14px;
-    color: #2d3436;
-}
-QListWidget::item {
-    padding: 8px;
-    border-bottom: 1px solid #dfe6e9;
-}
-QListWidget::item:selected {
-    background-color: #a29bfe;
-    color: white;
-}</string>
+          <string>Liste d'Achats  :</string>
          </property>
         </widget>
         <widget class="QDateEdit" name="lineEditDateNaissance_4">
@@ -3297,7 +3247,7 @@ QListWidget::item:selected {
           <rect>
            <x>800</x>
            <y>340</y>
-           <width>113</width>
+           <width>111</width>
            <height>28</height>
           </rect>
          </property>
@@ -3306,6 +3256,19 @@ QListWidget::item:selected {
          </property>
          <property name="placeholderText">
           <string>Chemin de l'ordonnance</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pushButton">
+         <property name="geometry">
+          <rect>
+           <x>920</x>
+           <y>340</y>
+           <width>90</width>
+           <height>29</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>PushButton</string>
          </property>
         </widget>
        </widget>
@@ -3382,7 +3345,7 @@ QPushButton:hover {
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_11">
        <widget class="QFrame" name="frame_10">
@@ -5590,11 +5553,11 @@ font-size: 20px;
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
-  <include location="mm.qrc"/>
+  <include location="M.qrc"/>
   <include location="img.qrc"/>
+  <include location="mm.qrc"/>
   <include location="Mpower.qrc"/>
   <include location="amg.qrc"/>
-  <include location="M.qrc"/>
  </resources>
  <connections/>
 </ui>
