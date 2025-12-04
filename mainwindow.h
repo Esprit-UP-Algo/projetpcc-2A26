@@ -106,10 +106,9 @@ private:
     QString ordonnancePath;
     QString genererNomCourt(const QString &cheminOriginal, const QString &prefixe);
     QString copierFichierVersDossierApp(const QString &sourcePath, const QString &dossier, const QString &prefixe);
-    void afficherPhotoPleinCadre(const QString &cheminPhoto);
     bool validerVisageHumain(const QString &cheminPhoto, QString &erreurMessage);
     void verifierInstallationOpenCV();
-
+    void afficherPhotoPleinCadre(const QString &cheminPhoto);
     void appliquerFiltreAvecSQL(const QString &filtre, const QString &recherche);
 };
 
